@@ -112,11 +112,45 @@ document.addEventListener('DOMContentLoaded', function() {
             registrationId: 'BD' + Date.now().toString().slice(-6)
         };
 
-        // Generate and download the certificate
-        generateCertificate(formData);
+        // Show success modal with download option
+        const successModal = document.createElement('div');
+        successModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm';
+        successModal.innerHTML = `
+            <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 transform transition-all animate-fadeIn">
+                <div class="text-center mb-6">
+                    <div class="inline-block p-3 bg-green-100 rounded-full mb-4">
+                        <i class="fas fa-check-circle text-4xl text-green-500"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Registration Successful!</h2>
+                    <p class="text-gray-600 mt-2">Thank you for registering as a blood donor</p>
+                </div>
 
-        // Show success message
-        alert('Registration successful! Your certificate has been downloaded.');
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">Registration ID:</span>
+                        <span class="font-semibold">${formData.registrationId}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Date:</span>
+                        <span>${formData.registrationDate}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <button onclick="generateCertificate(${JSON.stringify(formData)})" 
+                        class="w-full bg-primary text-white py-3 rounded-lg hover:bg-secondary transition duration-300 font-medium flex items-center justify-center space-x-2">
+                        <i class="fas fa-certificate"></i>
+                        <span>Download Certificate</span>
+                    </button>
+                    <button onclick="this.closest('.fixed').remove()" 
+                        class="w-full border border-gray-300 text-gray-600 py-3 rounded-lg hover:bg-gray-50 transition duration-300 font-medium">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(successModal);
         this.reset();
     });
 
@@ -225,45 +259,96 @@ function generateCertificate(data) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Add certificate content
-    doc.setFontSize(22);
-    doc.setTextColor('#e74c3c');
-    doc.text('Blood Donor Certificate', 105, 30, null, null, 'center');
+    // Add hospital logo/header
+    doc.setFillColor(231, 76, 60); // Red header
+    doc.rect(0, 0, 210, 15, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.text('LifeLink Blood Bank & Research Center', 105, 10, { align: 'center' });
 
-    doc.setFontSize(16);
-    doc.setTextColor('#333');
-    doc.text(`Certificate No: LF${Math.random().toString(36).substr(2, 9).toUpperCase()}`, 105, 40, null, null, 'center');
+    // Certificate title
+    doc.setTextColor(231, 76, 60);
+    doc.setFontSize(24);
+    doc.text('Blood Donor Certificate', 105, 35, { align: 'center' });
 
+    // Certificate number
     doc.setFontSize(12);
-    doc.text(`This is to certify that`, 105, 60, null, null, 'center');
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Certificate No: LF-${data.registrationId}`, 105, 45, { align: 'center' });
+
+    // Main certification text
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.text('This is to certify that', 105, 60, { align: 'center' });
+    
+    // Donor name
     doc.setFontSize(18);
-    doc.setTextColor('#e74c3c');
-    doc.text(data.fullName, 105, 70, null, null, 'center');
+    doc.setTextColor(231, 76, 60);
+    doc.text(data.fullName.toUpperCase(), 105, 70, { align: 'center' });
+
+    // Certification text
+    doc.setTextColor(0, 0, 0);
     doc.setFontSize(12);
-    doc.setTextColor('#333');
-    doc.text(`has successfully registered as a blood donor with LifeLink Blood Bank.`, 105, 80, null, null, 'center');
+    doc.text('has been registered as a voluntary blood donor with our organization.', 105, 80, { align: 'center' });
 
-    // Donor details
-    doc.setFontSize(12);
-    doc.text(`Blood Type: ${data.bloodType}`, 20, 100);
-    doc.text(`Phone: ${data.phoneNumber}`, 20, 110);
-    doc.text(`Email: ${data.email}`, 20, 120);
-    doc.text(`Location: ${data.location}`, 20, 130);
-    doc.text(`Registration Date: ${data.registrationDate}`, 20, 140);
+    // Donor Details Box
+    doc.setDrawColor(231, 76, 60);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(20, 90, 170, 60, 3, 3);
+    
+    doc.setFontSize(14);
+    doc.setTextColor(231, 76, 60);
+    doc.text('Donor Details', 30, 105);
 
-    // Hospital details
-    doc.text(`Hospital: LifeLink Blood Bank & Research Center`, 20, 160);
-    doc.text(`Address: 123 Medical Plaza, Healthcare District`, 20, 170);
-    doc.text(`Contact: +1 (555) 123-4567`, 20, 180);
+    // Donor information
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    const details = [
+        [`Blood Type: ${data.bloodType}`, `Registration Date: ${data.registrationDate}`],
+        [`Phone: ${data.phoneNumber}`, `Valid Until: ${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString()}`],
+        [`Email: ${data.email}`, `Next Eligible Donation: ${new Date(new Date().setDate(new Date().getDate() + 90)).toLocaleDateString()}`],
+        [`Address: ${data.location}`, `Donor ID: ${data.registrationId}`]
+    ];
 
-    // Signature
-    doc.text(`__________________________`, 140, 220);
-    doc.text(`Dr. Sarah Johnson`, 140, 230);
-    doc.text(`Medical Officer`, 140, 240);
-    doc.text(`License: ML-2024-1234`, 140, 250);
+    let yPos = 120;
+    details.forEach(row => {
+        doc.text(row[0], 30, yPos);
+        doc.text(row[1], 110, yPos);
+        yPos += 10;
+    });
+
+    // Hospital Details Box
+    doc.roundedRect(20, 160, 170, 35, 3, 3);
+    doc.setFontSize(11);
+    doc.text([
+        'Hospital: LifeLink Blood Bank & Research Center',
+        'Address: 123 Medical Plaza, Healthcare District, City, State - 12345',
+        'Contact: +1 (555) 123-4567  |  Email: info@lifelink.com'
+    ], 30, 175);
+
+    // Signatures
+    doc.setFontSize(11);
+    
+    // Medical Officer Signature
+    doc.addImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAoCAYAAAAIeF9DAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAOASURBVGiB7ZpNiBxFFMd/1T2zK1k/omJUFFGJH0g8GEHXeNK4Bj14UVBjwHjw4EEEL4KXgAY8ehC9Kh4UQQ9+IBrxICioKLtRUXQVRBAVjUrcrO7s9Ie7q6q7X1V3zUz3JLvzh2Z3qt579eqrV/XqVfUWnEXBWABuA+4HrgZ2AWeBE8DnwHPAy0ChxEeJZ+71MvA28DhwB7ATuAzYClwJ3AM8C7wFnARGwPsT8ZxFQQAMAB34vgpYD9SADcAqTdPAX8Bx4CjwFfA58KPMU+I5e70AXA5sBK4D1gNrgTXAeuAa4D7gIPA18APwD/Bj4jnrCYChxEeJZ+71KeAb4FPgEHAYOAP8BZwCvgM+AN4B3gSOyTwlnrPXfwLfAp8BHwEfA78AfwIngO+Bg8DrwGvAz8Bw1hMCQwGQeM5eB0AKrAJWA5cCVwA3AXuA24FbgZuBGzRN4jl7vQpYA1wAbAIuBK4FbgXuBG4DbpF5SjxnPSEwFACJ5+x1E+NNwE5gO3ApsEXTJJ6z15uZbGC2A9uArZom8Zy9bkp8h8RTAZAkPgKGQAtoR3iWeM5eD5lsYIZMNjASz9nrtsR3SDwVAEniI2AIzGNOZB7oAD1gEOFZ4jl73WOygekx2cBIPGev+xLfIfFUACSJj4A2xoQOxoQBxoQhMIrwLPGcvR4y2cAMmWxgJJ6z1yOJ75B4KgCSxEdAC2NCG2NCH2NCGxhGeJZ4zl4PmGxgBkw2MBLP2euBxHdIPBUASeIjoIkxoY0xoYcxoQUMIjxLPGevB0w2MAMmGxiJ5+z1UOI7JJ4KgCTxEdDAmNDCmNDDmNAABhGeJZ6z132MCX0mGxiJ5+x1X+I7JJ4KgCTxEVDHmNDEmNDFmFAH+hGeJZ6z1z0mG5gekw2MxHP2uifxHRJPBUCS+AioYUyoY0zoYEyoAb0IzxLP2esuxoQukw2MxHP2uivxHRJPBUCS+AioYkyoYUzoYEyoAt0IzxLP2esOxoQOkw2MxHP2uiPxHRJPBUCS+AioYEyoYkxoY0yoAJ0IzxLP2es2xoQ2kw2MxHP2ui3xHRJPBUCS+AjIMSbkGBNaGBNyoBPhWeI5e93CmNBisoGReM5etyS+Q+KpAEgSHwEZxoQMY0IDY0IGtCM8SzxnrxsYExoYEzKJ5+x1Q+I7JJ4KgCTxEfA/YTcYvzG6Gi4AAAAASUVORK5CYII=', 30, 210, 40, 20);
+    doc.text('Dr. Sarah Johnson', 30, 240);
+    doc.text('Medical Officer', 30, 245);
+    doc.text('License: ML-2024-1234', 30, 250);
+
+    // Director Signature
+    doc.addImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAoCAYAAAAIeF9DAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAOASURBVGiB7ZpNiBxFFMd/1T2zK1k/omJUFFGJH0g8GEHXeNK4Bj14UVBjwHjw4EEEL4KXgAY8ehC9Kh4UQQ9+IBrxICioKLtRUXQVRBAVjUrcrO7s9Ie7q6q7X1V3zUz3JLvzh2Z3qt579eqrV/XqVfUWnEXBWABuA+4HrgZ2AWeBE8DnwHPAy0ChxEeJZ+71MvA28DhwB7ATuAzYClwJ3AM8C7wFnARGwPsT8ZxFQQAMAB34vgpYD9SADcAqTdPAX8Bx4CjwFfA58KPMU+I5e70AXA5sBK4D1gNrgTXAeuAa4D7gIPA18APwD/Bj4jnrCYChxEeJZ+71KeAb4FPgEHAYOAP8BZwCvgM+AN4B3gSOyTwlnrPXfwLfAp8BHwEfA78AfwIngO+Bg8DrwGvAz8Bw1hMCQwGQeM5eB0AKrAJWA5cCVwA3AXuA24FbgZuBGzRN4jl7vQpYA1wAbAIuBK4FbgXuBG4DbpF5SjxnPSEwFACJ5+x1E+NNwE5gO3ApsEXTJJ6z15uZbGC2A9uArZom8Zy9bkp8h8RTAZAkPgKGQAtoR3iWeM5eD5lsYIZMNjASz9nrtsR3SDwVAEniI2AIzGNOZB7oAD1gEOFZ4jl73WOygekx2cBIPGev+xLfIfFUACSJj4A2xoQOxoQBxoQhMIrwLPGcvR4y2cAMmWxgJJ6z1yOJ75B4KgCSxEdAC2NCG2NCH2NCGxhGeJZ4zl4PmGxgBkw2MBLP2euBxHdIPBUASeIjoIkxoY0xoYcxoQUMIjxLPGevB0w2MAMmGxiJ5+z1UOI7JJ4KgCTxEdDAmNDCmNDDmNAABhGeJZ6z132MCX0mGxiJ5+x1X+I7JJ4KgCTxEVDHmNDEmNDFmFAH+hGeJZ6z1z0mG5gekw2MxHP2uifxHRJPBUCS+AioYUyoY0zoYEyoAb0IzxLP2esuxoQukw2MxHP2uivxHRJPBUCS+AioYkyoYUzoYEyoAt0IzxLP2esOxoQOkw2MxHP2uiPxHRJPBUCS+AioYEyoYkxoY0yoAJ0IzxLP2es2xoQ2kw2MxHP2ui3xHRJPBUCS+AjIMSbkGBNaGBNyoBPhWeI5e93CmNBisoGReM5etyS+Q+KpAEgSHwEZxoQMY0IDY0IGtCM8SzxnrxsYExoYEzKJ5+x1Q+I7JJ4KgCTxEfA/YTcYvzG6Gi4AAAAASUVORK5CYII=', 140, 210, 40, 20);
+    doc.text('Dr. Michael Chen', 140, 240);
+    doc.text('Medical Director', 140, 245);
+    doc.text('Hospital Seal', 140, 250);
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('This certificate is electronically generated and is valid for one year from the date of registration.', 105, 270, { align: 'center' });
 
     // Save the PDF
-    doc.save(`donor_certificate_${data.registrationId}.pdf`);
+    doc.save(`blood_donor_certificate_${data.registrationId}.pdf`);
 }
 
 function generateReceipt(data) {
