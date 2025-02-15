@@ -165,4 +165,41 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // News ticker interaction
+    const newsItems = document.querySelectorAll('.news-item');
+    
+    newsItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // Get the news text
+            const newsText = this.querySelector('span').textContent;
+            
+            // Create and show a modal or notification with the full news
+            const newsModal = document.createElement('div');
+            newsModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            newsModal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-lg mx-4 transform transition-all animate-fadeIn">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-primary">Blood Donation News</h3>
+                        <button class="text-gray-500 hover:text-primary">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <p class="text-gray-700">${newsText}</p>
+                    <div class="mt-4 text-sm text-gray-500">
+                        Published: ${new Date().toLocaleDateString()}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(newsModal);
+            
+            // Close modal on click
+            newsModal.addEventListener('click', function(e) {
+                if (e.target === this || e.target.closest('button')) {
+                    this.remove();
+                }
+            });
+        });
+    });
 }); 

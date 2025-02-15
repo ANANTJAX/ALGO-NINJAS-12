@@ -18,6 +18,25 @@
                     },
                     fontFamily: {
                         poppins: ['Poppins', 'sans-serif']
+                    },
+                    keyframes: {
+                        ticker: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-100%)' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        pulse: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '.5' }
+                        }
+                    },
+                    animation: {
+                        ticker: 'ticker 30s linear infinite',
+                        fadeIn: 'fadeIn 0.5s ease-out',
+                        newsPulse: 'pulse 2s ease-in-out infinite'
                     }
                 }
             }
@@ -195,37 +214,64 @@
         </div>
     </nav>
 
-    <!-- Add this right after the navbar section -->
-    <div class="bg-primary/5 fixed top-20 w-full z-30 overflow-hidden py-2 border-y border-primary/10">
-        <div class="news-ticker flex whitespace-nowrap">
-            <div class="flex items-center space-x-12 animate-ticker">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-newspaper text-primary"></i>
-                    <span>World Blood Donor Day celebrated across 190 countries</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-heart text-primary"></i>
-                    <span>Over 118.5 million blood donations collected globally</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-hospital text-primary"></i>
-                    <span>New mobile blood donation centers launched in rural areas</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-award text-primary"></i>
-                    <span>Blood donors save up to 3 lives with each donation</span>
+    <!-- Enhanced News Ticker Section -->
+    <div class="bg-gradient-to-r from-primary/5 to-secondary/5 fixed top-20 w-full z-30 overflow-hidden border-y border-primary/10">
+        <!-- News Header -->
+        <div class="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white via-white to-transparent z-10 flex items-center justify-center">
+            <div class="flex items-center space-x-2 text-primary font-semibold px-3">
+                <i class="fas fa-newspaper animate-newsPulse"></i>
+                <span>NEWS</span>
+            </div>
+        </div>
+        
+        <!-- News Ticker Content -->
+        <div class="news-ticker relative py-3 pl-28 pr-4">
+            <div class="flex whitespace-nowrap animate-ticker hover:pause-animation">
+                <!-- News Items -->
+                <div class="inline-flex items-center space-x-12 pl-4">
+                    <div class="news-item flex items-center space-x-2 group">
+                        <i class="fas fa-heartbeat text-primary group-hover:scale-110 transition-transform"></i>
+                        <span class="group-hover:text-primary transition-colors">World Blood Donor Day: Over 1 million units collected globally</span>
+                    </div>
+                    
+                    <div class="news-item flex items-center space-x-2 group">
+                        <i class="fas fa-hospital text-primary group-hover:scale-110 transition-transform"></i>
+                        <span class="group-hover:text-primary transition-colors">New mobile blood donation centers launched in 50 cities</span>
+                    </div>
+                    
+                    <div class="news-item flex items-center space-x-2 group">
+                        <i class="fas fa-award text-primary group-hover:scale-110 transition-transform"></i>
+                        <span class="group-hover:text-primary transition-colors">Local hero donates blood for the 100th time</span>
+                    </div>
+                    
+                    <div class="news-item flex items-center space-x-2 group">
+                        <i class="fas fa-chart-line text-primary group-hover:scale-110 transition-transform"></i>
+                        <span class="group-hover:text-primary transition-colors">Blood donation rates increase by 25% this year</span>
+                    </div>
+                    
+                    <div class="news-item flex items-center space-x-2 group">
+                        <i class="fas fa-users text-primary group-hover:scale-110 transition-transform"></i>
+                        <span class="group-hover:text-primary transition-colors">Community drive collects 500 units in a single day</span>
+                    </div>
                 </div>
                 <!-- Duplicate for seamless loop -->
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-newspaper text-primary"></i>
-                    <span>World Blood Donor Day celebrated across 190 countries</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-heart text-primary"></i>
-                    <span>Over 118.5 million blood donations collected globally</span>
+                <div class="inline-flex items-center space-x-12 pl-4">
+                    <!-- Duplicate news items here -->
+                    <div class="news-item flex items-center space-x-2 group">
+                        <i class="fas fa-heartbeat text-primary group-hover:scale-110 transition-transform"></i>
+                        <span class="group-hover:text-primary transition-colors">World Blood Donor Day: Over 1 million units collected globally</span>
+                    </div>
+                    
+                    <div class="news-item flex items-center space-x-2 group">
+                        <i class="fas fa-hospital text-primary group-hover:scale-110 transition-transform"></i>
+                        <span class="group-hover:text-primary transition-colors">New mobile blood donation centers launched in 50 cities</span>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Gradient Fade Effect -->
+        <div class="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white via-white to-transparent z-10"></div>
     </div>
 
     <!-- Enhanced Hero Section with Background Image -->

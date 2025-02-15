@@ -296,4 +296,51 @@ footer {
 
 #loginForm button:hover {
     background-color: var(--secondary-color);
+}
+
+/* News Ticker Styles */
+.news-ticker {
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 10%,
+        black 90%,
+        transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 10%,
+        black 90%,
+        transparent 100%
+    );
+}
+
+/* Pause animation on hover */
+.hover\:pause-animation:hover {
+    animation-play-state: paused;
+}
+
+/* News item hover effect */
+.news-item {
+    position: relative;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.news-item:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Add responsive adjustments */
+@media (max-width: 768px) {
+    .news-ticker {
+        font-size: 0.875rem;
+    }
+    
+    .news-item {
+        padding: 0.25rem 0.5rem;
+    }
 } 
