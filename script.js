@@ -112,50 +112,11 @@ document.addEventListener('DOMContentLoaded', function() {
             registrationId: 'BD' + Date.now().toString().slice(-6)
         };
 
-        // Show success message with certificate download option
-        const certificateModal = document.createElement('div');
-        certificateModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm';
-        certificateModal.innerHTML = `
-            <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 transform transition-all animate-fadeIn">
-                <div class="text-center mb-6">
-                    <div class="inline-block p-3 bg-green-100 rounded-full mb-4">
-                        <i class="fas fa-check-circle text-4xl text-green-500"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-800">Registration Successful!</h2>
-                    <p class="text-gray-600 mt-2">Thank you for registering as a blood donor</p>
-                </div>
+        // Generate and download the certificate
+        generateCertificate(formData);
 
-                <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                    <div class="flex justify-between mb-2">
-                        <span class="text-gray-600">Registration ID:</span>
-                        <span class="font-semibold">${formData.registrationId}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Date:</span>
-                        <span>${formData.registrationDate}</span>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <button onclick="generateCertificate(${JSON.stringify(formData)})" 
-                        class="w-full bg-primary text-white py-3 rounded-lg hover:bg-secondary transition duration-300 font-medium flex items-center justify-center space-x-2">
-                        <i class="fas fa-certificate"></i>
-                        <span>Download Certificate</span>
-                    </button>
-                    <button onclick="generateReceipt(${JSON.stringify(formData)})"
-                        class="w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-gray-700 transition duration-300 font-medium flex items-center justify-center space-x-2">
-                        <i class="fas fa-receipt"></i>
-                        <span>Download Receipt</span>
-                    </button>
-                    <button onclick="this.closest('.fixed').remove()" 
-                        class="w-full border border-gray-300 text-gray-600 py-3 rounded-lg hover:bg-gray-50 transition duration-300 font-medium">
-                        Close
-                    </button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(certificateModal);
+        // Show success message
+        alert('Registration successful! Your certificate has been downloaded.');
         this.reset();
     });
 
@@ -261,46 +222,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Add these functions for generating certificates and receipts
 function generateCertificate(data) {
-    const certificateHTML = `
-        <div style="width: 800px; padding: 40px; border: 2px solid #e74c3c; border-radius: 10px; font-family: Arial, sans-serif;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #e74c3c; font-size: 28px; margin-bottom: 10px;">Blood Donor Certificate</h1>
-                <div style="color: #666;">Registration ID: ${data.registrationId}</div>
-            </div>
-            
-            <div style="text-align: center; margin-bottom: 30px;">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAB2AAAAdgB+lymcgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAVESURBVHic7ZtpiFVVGIbfO2opdlE0FkGWRBFR0Y9WrcyybCGiIoQKI4qyaIOKaBFbaMEwIlv4I6Kogbb8UUYULdgEUdkiZYFWRpEVLRNqVpTd0w/PueP97j1nzj3nnntnxvuBw7nfWs5593fW813OHSkQMEXSFEmTJY2XNFrSLkl/S1oraZWkNyR9HkJwJZ0zgACcBbwBbCfONmAZcE4/9bsTwBhgQQYj67MBmA/s2d/6xgBOAj7JaXgtPwLX9LfuOwAcB7zbpPH1eRwY2W86AxcCv7TI+Fr+BE7vF92BEcDDwL4OGl/LbmBmr+sNHAZ82EXGH7AAaGQVbQJW5GxvObBPL+oMXAps6iLDXwNOBgYDRwOzgG9ytrkZuKQX9AXuAPZ0gdEvAiMT9BwGzAX25Gh/D3BbN+oKDAHmAVUPg3cCc4DBTeg7FViZox/VKLvtpgHAocBST0N/Ae4HhmbUOw5Y7dGnpcBBnaQrMAFY52HcV8DxOXUPiUSKHH3bCBzfCboClwN/ORi0EzgfGNGC/gwCbgZ2OPRvB3BBu/QFpgFVB0O2AJe1Q/8IYLlDP6tRWbPpOgNTgL8dDFgHnNwJG4AZwA6H/m4GTmyFrsChwHsOHd8CTO6kLcBE4EeHcXwEHJJXV2Ao8KxDR38Aru4GmyLZ7Q7jeQo/l/1/XYDHHD5+P3B4txkEDAYedhjXI3n0vM+h0Q+7dTkk2PKYQ/+z5wPgWYfGvgMO6HajgKMc5oP5WfW8x6GhDcCYXjAKGAv84jC+u7LoOMGhke3AKb1kGHAq8IfDGI/NouNqhwa2Aqf1omGRrLbNYZxvp9VvuMPHdwATetk44GSH7TPA4Wmz/2KHj+8GpvWDccB0h8kQYFZa3Ucc5L8EJvWTccAFKQtqbV5Jq/uNDrLfA8f0o4HHAQ7FGeBhB9nNwNH9aSDpq0LbgRscZP8BxoUQdqXR7VIVlnQwsEzSyQ5VHgghvJFGr0sIYa2kRyVdnVJlkKSXJE0MIexM0usyB0h6UtJZKev/IenBtEpdQgjzJC1OWX2cpGdS63WQPwD4PuUvvxc4s5eNvzalrVuA/Zv5uMsc8JWkgxKK90qaE0J4PoXMHpIGSRoqaYSkEZKGS9pL0l5RGSFpH0nDJA2VtFVSRdJ2SVsl/SVpW1TeIWmLpN8lbZL0Wwhhe0LbiyRdkVD8Tgjh/CQZuRhfkTQzofhrSVeGEL5NkBku6URJE6IyXtI4SQdJGippSAZ1d0vaIukPSesl/SBpbVTWhBB2JMh+IenyhOKlIYQbmn48xRwwVNLPkvZPqLJc0k0hhF0Jxh8p6URJE6MyQdIRkgZnMDovOyStl7RW0mpJqyStCiH8Wl8phPBuQv0Nko4MIexu9OEkA0ZLWqPGy9UySbNCCNWEwR8v6QxJp0s6TdL+SQb0EL9KWilphaQPQwh/1haEEFYk1F0eQpje6GNJc8BsSU80KN4oaWoIYUPdoMdJukZmfKNJrldZL+l1SUtCCJ/VF4QQViTUezqEcFejDyUZ8Kakq+qKdkq6MITwSd1gL5Y0W9KlkrKcz/UyFUkvSnqm9pcOIaxIqHd3COHxRh9KMuBTSWfXFd0bQnisbrBTZbP9eXkHsAdZJulhSW+HEELCr/+4pPvqiu8JITzW6CNJBmyWNKqu6NQQwmd1g31BZnyWOO1DYKWkByS9H0KoJhifZMBxIYS1jT6QZEDScvVFCGFKC43qd0IIG5PKk+aApD3/jyGEhsveYEmfhhDOTKOgEMKvktak+N9/AEkGfNiFOvQsafYD3pJ0XhfqkIjMPYG8/AshDOV4/qkJ4QAAAABJRU5ErkJggg==" 
-                    alt="Blood Drop Icon" style="width: 60px; height: 60px;">
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-                <p style="font-size: 18px; line-height: 1.6; text-align: center;">
-                    This is to certify that<br>
-                    <span style="font-size: 24px; font-weight: bold; color: #e74c3c;">${data.fullName}</span><br>
-                    has registered as a blood donor with LifeLink
-                </p>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; margin-bottom: 40px; color: #666;">
-                <div>
-                    <p><strong>Blood Type:</strong> ${data.bloodType}</p>
-                    <p><strong>Phone:</strong> ${data.phoneNumber}</p>
-                </div>
-                <div>
-                    <p><strong>Location:</strong> ${data.location}</p>
-                    <p><strong>Date:</strong> ${data.registrationDate}</p>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
-                <p style="color: #666; font-size: 12px;">
-                    This certificate is electronically generated and is valid for one year from the date of registration.
-                </p>
-            </div>
-        </div>
-    `;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-    downloadPDF(certificateHTML, `donor_certificate_${data.registrationId}.pdf`);
+    // Add certificate content
+    doc.setFontSize(22);
+    doc.setTextColor('#e74c3c');
+    doc.text('Blood Donor Certificate', 105, 30, null, null, 'center');
+
+    doc.setFontSize(16);
+    doc.setTextColor('#333');
+    doc.text(`Certificate No: LF${Math.random().toString(36).substr(2, 9).toUpperCase()}`, 105, 40, null, null, 'center');
+
+    doc.setFontSize(12);
+    doc.text(`This is to certify that`, 105, 60, null, null, 'center');
+    doc.setFontSize(18);
+    doc.setTextColor('#e74c3c');
+    doc.text(data.fullName, 105, 70, null, null, 'center');
+    doc.setFontSize(12);
+    doc.setTextColor('#333');
+    doc.text(`has successfully registered as a blood donor with LifeLink Blood Bank.`, 105, 80, null, null, 'center');
+
+    // Donor details
+    doc.setFontSize(12);
+    doc.text(`Blood Type: ${data.bloodType}`, 20, 100);
+    doc.text(`Phone: ${data.phoneNumber}`, 20, 110);
+    doc.text(`Email: ${data.email}`, 20, 120);
+    doc.text(`Location: ${data.location}`, 20, 130);
+    doc.text(`Registration Date: ${data.registrationDate}`, 20, 140);
+
+    // Hospital details
+    doc.text(`Hospital: LifeLink Blood Bank & Research Center`, 20, 160);
+    doc.text(`Address: 123 Medical Plaza, Healthcare District`, 20, 170);
+    doc.text(`Contact: +1 (555) 123-4567`, 20, 180);
+
+    // Signature
+    doc.text(`__________________________`, 140, 220);
+    doc.text(`Dr. Sarah Johnson`, 140, 230);
+    doc.text(`Medical Officer`, 140, 240);
+    doc.text(`License: ML-2024-1234`, 140, 250);
+
+    // Save the PDF
+    doc.save(`donor_certificate_${data.registrationId}.pdf`);
 }
 
 function generateReceipt(data) {
