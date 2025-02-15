@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - LifeLink</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <nav class="dashboard-nav">
+            <h1>Admin Dashboard</h1>
+            <div class="notification-badge" id="notification-badge">0</div>
+        </nav>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <h3>Total Donors</h3>
+                <p id="totalDonors">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Requests</h3>
+                <p id="pendingRequests">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Successful Donations</h3>
+                <p id="successfulDonations">0</p>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3>Blood Type Availability</h3>
+                <canvas id="bloodTypeChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Monthly Donations</h3>
+                <canvas id="donationChart"></canvas>
+            </div>
+        </div>
+
+        <div class="recent-activity">
+            <h3>Recent Activity</h3>
+            <div id="activityLog"></div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="admin-dashboard.js"></script>
+    <script src="notification-system.js"></script>
+</body>
+</html> 

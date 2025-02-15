@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeLink - Blood Donation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#e74c3c',
+                        secondary: '#c0392b',
+                        dark: '#2c3e50'
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-poppins">
+    <!-- Login Modal -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-primary">Login</h2>
+                <button class="close text-gray-500 hover:text-primary text-2xl">&times;</button>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <input type="email" placeholder="Email" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                </div>
+                <div>
+                    <input type="password" placeholder="Password" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                </div>
+                <button type="submit"
+                    class="w-full bg-primary text-white py-3 rounded-lg hover:bg-secondary transition duration-300 font-medium">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md fixed w-full z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2 text-primary">
+                    <i class="fas fa-heartbeat text-2xl"></i>
+                    <span class="text-xl font-bold">LifeLink</span>
+                </div>
+                <ul class="hidden md:flex items-center space-x-8">
+                    <li><a href="#home" class="hover:text-primary transition">Home</a></li>
+                    <li><a href="#donate" class="hover:text-primary transition">Donate</a></li>
+                    <li><a href="#request" class="hover:text-primary transition">Request Blood</a></li>
+                    <li><a href="#about" class="hover:text-primary transition">About</a></li>
+                    <li>
+                        <button id="loginBtn"
+                            class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-secondary transition duration-300">
+                            Login
+                        </button>
+                    </li>
+                </ul>
+                <button class="md:hidden text-primary text-2xl" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Enhanced Hero Section with Background Image -->
+    <section id="home" class="pt-20 min-h-screen relative">
+        <!-- Background image overlay -->
+        <div class="absolute inset-0 bg-cover bg-center z-0" 
+             style="background-image: url('https://images.unsplash.com/photo-1615461066841-6116e61058f4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/90 to-secondary/90 z-10"></div>
+        
+        <!-- Content -->
+        <div class="container mx-auto px-4 py-20 relative z-20">
+            <div class="max-w-3xl mx-auto text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight text-white">
+                    Save Lives Through Blood Donation
+                </h1>
+                <p class="text-xl mb-10 text-white/90">
+                    Connect with blood donors in real-time and make a difference
+                </p>
+                <div class="flex flex-col md:flex-row gap-4 justify-center">
+                    <button id="donateBtn"
+                        class="bg-white text-primary px-8 py-4 rounded-lg hover:bg-gray-100 transition duration-300 font-semibold text-lg group">
+                        <i class="fas fa-heart mr-2 group-hover:text-red-600"></i>
+                        Donate Blood
+                    </button>
+                    <button id="requestBtn"
+                        class="bg-primary text-white px-8 py-4 rounded-lg hover:bg-secondary transition duration-300 font-semibold text-lg border-2 border-white group">
+                        <i class="fas fa-hand-holding-medical mr-2 group-hover:scale-110 transform transition-transform"></i>
+                        Request Blood
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section (New) -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center p-6 hover:transform hover:scale-105 transition duration-300">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-tint text-3xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Safe & Secure</h3>
+                    <p class="text-gray-600">All donations are screened and verified for safety</p>
+                </div>
+                <div class="text-center p-6 hover:transform hover:scale-105 transition duration-300">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-clock text-3xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">24/7 Support</h3>
+                    <p class="text-gray-600">Emergency support available round the clock</p>
+                </div>
+                <div class="text-center p-6 hover:transform hover:scale-105 transition duration-300">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt text-3xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Location Based</h3>
+                    <p class="text-gray-600">Find donors near your location</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section (New) -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-primary mb-2">5000+</div>
+                    <div class="text-gray-600">Active Donors</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-primary mb-2">10000+</div>
+                    <div class="text-gray-600">Lives Saved</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-primary mb-2">1000+</div>
+                    <div class="text-gray-600">Monthly Donations</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-primary mb-2">100+</div>
+                    <div class="text-gray-600">Partner Hospitals</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Donation Section -->
+    <section id="donate" class="py-20 bg-gray-50 relative">
+        <div class="absolute inset-0 opacity-10 bg-cover bg-center"
+             style="background-image: url('https://images.unsplash.com/photo-1579154204601-01588f351e67?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');"></div>
+        <div class="container mx-auto px-4 relative">
+            <h2 class="text-3xl font-bold text-center mb-12 text-dark">Become a Donor</h2>
+            <div class="max-w-2xl mx-auto">
+                <form id="donorForm" class="bg-white rounded-lg shadow-lg p-8 space-y-6">
+                    <div>
+                        <input type="text" placeholder="Full Name" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div>
+                        <input type="email" placeholder="Email" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div>
+                        <select id="donorBloodType" name="bloodType" required aria-label="Select Blood Type"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                            <option value="">Select Blood Type</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="tel" placeholder="Phone Number" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div>
+                        <input type="text" placeholder="Location" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-primary text-white py-4 rounded-lg hover:bg-secondary transition duration-300 font-semibold text-lg">
+                        Register as Donor
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Request Section -->
+    <section id="request" class="py-20 bg-white relative">
+        <div class="absolute inset-0 opacity-10 bg-cover bg-center"
+             style="background-image: url('https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');"></div>
+        <div class="container mx-auto px-4 relative">
+            <h2 class="text-3xl font-bold text-center mb-12 text-dark">Request Blood</h2>
+            <div class="max-w-2xl mx-auto">
+                <form id="requestForm" class="bg-gray-50 rounded-lg shadow-lg p-8 space-y-6">
+                    <div>
+                        <input type="text" placeholder="Patient Name" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div>
+                        <input type="email" placeholder="Contact Email" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div>
+                        <select id="requestBloodType" name="bloodType" required aria-label="Select Required Blood Type"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                            <option value="">Required Blood Type</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="tel" placeholder="Emergency Contact" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div>
+                        <input type="text" placeholder="Hospital Location" required
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div>
+                        <textarea placeholder="Additional Details" rows="4"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"></textarea>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-primary text-white py-4 rounded-lg hover:bg-secondary transition duration-300 font-semibold text-lg">
+                        Submit Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blood Type Compatibility Chart (New) -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-dark">Blood Type Compatibility</h2>
+            <div class="max-w-4xl mx-auto bg-gray-50 rounded-lg shadow-lg p-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="text-center p-4 bg-white rounded-lg shadow">
+                        <div class="text-2xl font-bold text-primary mb-2">A+</div>
+                        <div class="text-sm text-gray-600">Can receive from:<br>A+, A-, O+, O-</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg shadow">
+                        <div class="text-2xl font-bold text-primary mb-2">B+</div>
+                        <div class="text-sm text-gray-600">Can receive from:<br>B+, B-, O+, O-</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg shadow">
+                        <div class="text-2xl font-bold text-primary mb-2">AB+</div>
+                        <div class="text-sm text-gray-600">Universal Recipient<br>Can receive from all</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg shadow">
+                        <div class="text-2xl font-bold text-primary mb-2">O-</div>
+                        <div class="text-sm text-gray-600">Universal Donor<br>Can give to all</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold text-primary mb-4">LifeLink</h3>
+                    <p class="text-gray-400">Connecting donors with those in need</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-primary transition">Home</a></li>
+                        <li><a href="#donate" class="text-gray-400 hover:text-primary transition">Donate</a></li>
+                        <li><a href="#request" class="text-gray-400 hover:text-primary transition">Request Blood</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-primary transition">About</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Contact Us</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><i class="fas fa-envelope mr-2"></i>info@lifelink.com</li>
+                        <li><i class="fas fa-phone mr-2"></i>+1 234 567 890</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 LifeLink. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
