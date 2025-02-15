@@ -11,18 +11,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const donateBtn = document.getElementById('donateBtn');
     const requestBtn = document.getElementById('requestBtn');
 
+    // Add this to your existing JavaScript
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const modalContent = document.getElementById('modalContent');
+    const emergencyBtn = document.getElementById('emergencyBtn');
+
     // Login Modal functionality
     loginBtn.onclick = function() {
-        modal.style.display = "block";
+        modal.style.display = "flex";
+        // Add entrance animation
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
     }
 
     closeBtn.onclick = function() {
-        modal.style.display = "none";
+        // Add exit animation
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.style.display = "none";
+        }, 200);
     }
 
+    // Close modal when clicking outside
     window.onclick = function(event) {
         if (event.target == modal) {
-            modal.style.display = "none";
+            closeBtn.click();
         }
     }
 
@@ -90,10 +107,31 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('#request').scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Smooth scrolling for all navigation links
+    // Mobile menu toggle
+    mobileMenuBtn.addEventListener('click', function() {
+        const isHidden = mobileMenu.classList.contains('hidden');
+        mobileMenu.classList.toggle('hidden');
+        
+        // Change icon based on menu state
+        mobileMenuBtn.innerHTML = isHidden 
+            ? '<i class="fas fa-times"></i>' 
+            : '<i class="fas fa-bars"></i>';
+    });
+
+    // Emergency button functionality
+    emergencyBtn.addEventListener('click', function() {
+        const confirmation = confirm('This will connect you to emergency services. Continue?');
+        if (confirmation) {
+            alert('Connecting to nearest blood bank...');
+            // Add your emergency contact logic here
+        }
+    });
+
+    // Add smooth scroll behavior for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
+            mobileMenu.classList.add('hidden'); // Close mobile menu if open
             document.querySelector(this.getAttribute('href')).scrollIntoView({
                 behavior: 'smooth'
             });
