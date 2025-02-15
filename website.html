@@ -146,7 +146,7 @@
                     <li>
                         <button id="loginBtn" class="flex items-center space-x-2 bg-primary text-white px-6 py-2 rounded-lg hover:bg-secondary transition duration-300 group">
                             <i class="fas fa-user-circle text-sm group-hover:rotate-12 transition-transform"></i>
-                            <span>Login</span>
+                            <span class="login-text">Login</span>
                         </button>
                     </li>
                 </ul>
@@ -194,6 +194,39 @@
             </div>
         </div>
     </nav>
+
+    <!-- Add this right after the navbar section -->
+    <div class="bg-primary/5 fixed top-20 w-full z-30 overflow-hidden py-2 border-y border-primary/10">
+        <div class="news-ticker flex whitespace-nowrap">
+            <div class="flex items-center space-x-12 animate-ticker">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-newspaper text-primary"></i>
+                    <span>World Blood Donor Day celebrated across 190 countries</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-heart text-primary"></i>
+                    <span>Over 118.5 million blood donations collected globally</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-hospital text-primary"></i>
+                    <span>New mobile blood donation centers launched in rural areas</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-award text-primary"></i>
+                    <span>Blood donors save up to 3 lives with each donation</span>
+                </div>
+                <!-- Duplicate for seamless loop -->
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-newspaper text-primary"></i>
+                    <span>World Blood Donor Day celebrated across 190 countries</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-heart text-primary"></i>
+                    <span>Over 118.5 million blood donations collected globally</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Enhanced Hero Section with Background Image -->
     <section id="home" class="pt-20 min-h-screen relative">

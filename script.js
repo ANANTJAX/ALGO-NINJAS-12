@@ -17,14 +17,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalContent = document.getElementById('modalContent');
     const emergencyBtn = document.getElementById('emergencyBtn');
 
+    const loginText = document.querySelector('.login-text');
+
     // Login Modal functionality
     loginBtn.onclick = function() {
-        modal.style.display = "flex";
-        // Add entrance animation
-        setTimeout(() => {
-            modalContent.classList.remove('scale-95', 'opacity-0');
-            modalContent.classList.add('scale-100', 'opacity-100');
-        }, 10);
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            // Handle logout
+            const confirmation = confirm('Are you sure you want to logout?');
+            if (confirmation) {
+                loginText.textContent = 'Login';
+                loginBtn.classList.remove('bg-gray-600');
+                loginBtn.classList.add('bg-primary');
+                localStorage.removeItem('isLoggedIn');
+                return;
+            }
+        } else {
+            // Show login modal
+            modal.style.display = "flex";
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
     }
 
     closeBtn.onclick = function() {
@@ -43,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Login form submission
+    // Enhanced login form submission
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const email = this.querySelector('input[type="email"]').value;
@@ -51,17 +65,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Simple validation
         if (email && password) {
-            alert('Login successful!');
-            modal.style.display = "none";
-            loginBtn.textContent = 'Logout';
-            // Store login state
-            localStorage.setItem('isLoggedIn', 'true');
+            // Add success animation
+            const button = loginBtn.querySelector('.login-text');
+            button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+            
+            setTimeout(() => {
+                // Show success message
+                alert('Login successful!');
+                modal.style.display = "none";
+                loginText.textContent = 'Logout';
+                loginBtn.classList.remove('bg-primary');
+                loginBtn.classList.add('bg-gray-600');
+                // Store login state
+                localStorage.setItem('isLoggedIn', 'true');
+                // Reset form
+                loginForm.reset();
+                button.textContent = 'Logout';
+            }, 1000);
         }
     });
 
     // Check login state on page load
     if (localStorage.getItem('isLoggedIn') === 'true') {
-        loginBtn.textContent = 'Logout';
+        loginText.textContent = 'Logout';
+        loginBtn.classList.remove('bg-primary');
+        loginBtn.classList.add('bg-gray-600');
     }
 
     // Donor form submission
