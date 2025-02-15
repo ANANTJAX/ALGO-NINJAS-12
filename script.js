@@ -412,4 +412,81 @@ function downloadPDF(html, filename) {
         width: 170,
         windowWidth: 650
     });
+}
+
+// Add this to your script.js
+function initializeMatchingSystem() {
+    const socket = io(); // Requires Socket.IO for real-time updates
+    
+    socket.on('matchFound', (data) => {
+        showMatchNotification(data);
+    });
+}
+
+function showMatchNotification(matchData) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border-l-4 border-primary animate-slideIn';
+    notification.innerHTML = `
+        <div class="flex items-start space-x-4">
+            <div class="flex-shrink-0">
+                <i class="fas fa-handshake text-2xl text-primary"></i>
+            </div>
+            <div>
+                <h4 class="font-semibold">Match Found!</h4>
+                <p class="text-sm text-gray-600">A ${matchData.bloodType} recipient needs blood at ${matchData.hospital}</p>
+                <div class="mt-3 flex space-x-3">
+                    <button onclick="acceptMatch('${matchData.id}')" 
+                        class="px-3 py-1 bg-primary text-white rounded-lg text-sm hover:bg-secondary transition">
+                        Accept
+                    </button>
+                    <button onclick="declineMatch('${matchData.id}')"
+                        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition">
+                        Decline
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+}
+
+function acceptMatch(matchId) {
+    // Send acceptance to server
+    fetch('/api/matches/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Show hospital directions and instructions
+        showDirections(data.hospitalDetails);
+    });
+}
+
+function setupDonationReminders(lastDonationDate) {
+    // Calculate next eligible donation date (3 months from last donation)
+    const nextEligibleDate = new Date(lastDonationDate);
+    nextEligibleDate.setMonth(nextEligibleDate.getMonth() + 3);
+    
+    // Set up reminder notification
+    if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                // Schedule reminder 1 day before eligibility
+                const reminderDate = new Date(nextEligibleDate);
+                reminderDate.setDate(reminderDate.getDate() - 1);
+                
+                const timeUntilReminder = reminderDate.getTime() - new Date().getTime();
+                
+                setTimeout(() => {
+                    new Notification('Blood Donation Reminder', {
+                        body: 'You will be eligible to donate blood tomorrow!',
+                        icon: '/path/to/icon.png'
+                    });
+                }, timeUntilReminder);
+            }
+        });
+    }
 } 

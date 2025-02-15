@@ -298,7 +298,7 @@ footer {
     background-color: var(--secondary-color);
 }
 
-/* News Ticker Styles */
+/* Enhanced News Ticker Styles */
 .news-ticker {
     mask-image: linear-gradient(
         to right,
@@ -316,25 +316,45 @@ footer {
     );
 }
 
-/* Pause animation on hover */
-.hover\:pause-animation:hover {
-    animation-play-state: paused;
-}
-
-/* News item hover effect */
+/* Enhanced news item hover effects */
 .news-item {
     position: relative;
     padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     transition: all 0.3s ease;
 }
 
 .news-item:hover {
-    background-color: rgba(231, 76, 60, 0.1);
+    background-color: rgba(231, 76, 60, 0.05);
     transform: translateY(-2px);
 }
 
-/* Add responsive adjustments */
+.news-item::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 70%;
+    background: linear-gradient(to bottom, transparent, rgba(231, 76, 60, 0.2), transparent);
+}
+
+.news-item:last-child::after {
+    display: none;
+}
+
+/* Animation for the news icon */
+@keyframes gentle-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+.animate-gentle-pulse {
+    animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .news-ticker {
         font-size: 0.875rem;
@@ -343,4 +363,35 @@ footer {
     .news-item {
         padding: 0.25rem 0.5rem;
     }
+    
+    .news-item .w-8 {
+        width: 1.75rem;
+    }
+    
+    .news-item .h-8 {
+        height: 1.75rem;
+    }
+}
+
+/* Add these to your existing styles */
+.transform {
+    transform: translateY(0);
+}
+
+.transition-transform {
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+.duration-500 {
+    transition-duration: 500ms;
+}
+
+.group:hover .group-hover\:scale-110 {
+    transform: scale(1.1);
+}
+
+.group:hover .group-hover\:translate-y-0 {
+    transform: translateY(0);
 } 
