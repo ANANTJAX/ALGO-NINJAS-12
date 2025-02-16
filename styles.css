@@ -394,4 +394,50 @@ footer {
 
 .group:hover .group-hover\:translate-y-0 {
     transform: translateY(0);
+}
+
+.connection-interface {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 400px;
+    z-index: 1000;
+    text-align: left;
+}
+
+.connection-interface h3 {
+    color: var(--primary-color);
+}
+
+.connection-interface button {
+    display: block;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.connection-interface button:hover {
+    background-color: var(--secondary-color);
+}
+
+.notification-popup {
+    z-index: 1000;
+    max-width: 300px;
+    text-align: left;
+}
+
+.notification-popup h4 {
+    margin-bottom: 0.5rem;
+}
+
+.notification-popup button {
+    display: block;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.notification-popup button:hover {
+    background-color: var(--secondary-color);
 } 

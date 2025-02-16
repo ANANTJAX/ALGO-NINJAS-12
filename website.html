@@ -117,6 +117,64 @@
         </div>
     </div>
 
+    <!-- Register Modal -->
+    <div id="registerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-center mb-6">Create Account</h2>
+            <form id="registerForm" class="space-y-4">
+                <!-- User Type Selection -->
+                <div class="space-y-2">
+                    <label class="text-gray-700 font-medium">Register as</label>
+                    <div class="flex gap-4">
+                        <label class="flex-1 flex items-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors">
+                            <input type="radio" name="userType" value="donor" required class="mr-2">
+                            <span>Blood Donor</span>
+                        </label>
+                        <label class="flex-1 flex items-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors">
+                            <input type="radio" name="userType" value="requester" required class="mr-2">
+                            <span>Blood Requester</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Common Fields -->
+                <input type="text" placeholder="Full Name" required class="w-full px-4 py-3 rounded-lg border">
+                <input type="email" placeholder="Email" required class="w-full px-4 py-3 rounded-lg border">
+                <input type="password" placeholder="Password" required class="w-full px-4 py-3 rounded-lg border">
+                <input type="tel" placeholder="Phone Number" required class="w-full px-4 py-3 rounded-lg border">
+                
+                <!-- Blood Group Selection -->
+                <select name="bloodGroup" required class="w-full px-4 py-3 rounded-lg border">
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+
+                <!-- Preferred Hospital -->
+                <select name="preferredHospital" required class="w-full px-4 py-3 rounded-lg border">
+                    <option value="">Select Preferred Hospital</option>
+                    <option value="AIIMS_Delhi">AIIMS Delhi</option>
+                    <option value="Fortis_Hospital">Fortis Hospital</option>
+                    <option value="Apollo_Hospital">Apollo Hospital</option>
+                    <option value="Max_Hospital">Max Healthcare</option>
+                </select>
+
+                <input type="hidden" id="locationLat" name="locationLat">
+                <input type="hidden" id="locationLng" name="locationLng">
+
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg">
+                    Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Navbar -->
     <nav class="bg-white shadow-md fixed w-full z-40">
         <div class="container mx-auto px-4">
@@ -514,6 +572,8 @@
                         <input type="datetime-local" required
                             class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
                     </div>
+                    <input type="hidden" id="locationLat" name="locationLat">
+                    <input type="hidden" id="locationLng" name="locationLng">
                     <button type="submit"
                         class="w-full bg-primary text-white py-4 rounded-lg hover:bg-secondary transition duration-300 font-semibold text-lg">
                         Register as Donor
@@ -632,8 +692,45 @@
         </div>
     </footer>
 
+    <!-- Blood Request Form -->
+    <div id="requestBloodModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-center mb-6">Request Blood</h2>
+            <form id="bloodRequestForm" class="space-y-4">
+                <select name="bloodGroup" required class="w-full px-4 py-3 rounded-lg border">
+                    <option value="">Blood Group Needed</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <!-- ... other blood groups ... -->
+                </select>
+
+                <select name="urgencyLevel" required class="w-full px-4 py-3 rounded-lg border">
+                    <option value="">Select Urgency Level</option>
+                    <option value="normal">Normal</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="emergency">Emergency</option>
+                </select>
+
+                <select name="hospital" required class="w-full px-4 py-3 rounded-lg border">
+                    <option value="">Select Hospital</option>
+                    <option value="AIIMS_Delhi">AIIMS Delhi</option>
+                    <!-- ... other hospitals ... -->
+                </select>
+
+                <textarea placeholder="Additional Notes" class="w-full px-4 py-3 rounded-lg border"></textarea>
+
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg">
+                    Submit Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="map" style="height: 400px; width: 100%;"></div>
+
     <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
 </body>
 </html>

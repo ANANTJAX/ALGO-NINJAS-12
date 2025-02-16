@@ -1,11 +1,36 @@
 const express = require('express');
 const mongoose = require('mongoose');
+
+const mongoURI = "mongodb+srv://<anantjain7463>:<ANANTJAIN>@BLOOD-DONATION.xyz.mongodb.net/blood_donation?retryWrites=true&w=majority";
+
+async function connectDB() {
+    try {
+        await mongoose.connect(mongoURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log("MongoDB connected successfully!");
+    } catch (error) {
+        console.error("Error connecting to MongoDB:", error);
+        process.exit(1);
+    }
+}
+module.exports = connectDB;
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const socket = require('socket.io');
 const app = express();
+app.use(express.json());
+
+// Connect to MongoDB
+connectDB();
+
+app.get("/", (req, res) => {
+    res.send("MongoDB Atlas Connected!");
+});
+
 
 // Middleware
 app.use(cors());
@@ -36,7 +61,11 @@ const userSchema = new mongoose.Schema({
         message: String,
         date: { type: Date, default: Date.now },
         read: { type: Boolean, default: false }
-    }]
+    }],
+    userType: String,
+    bloodGroup: String,
+    preferredHospital: String,
+    lastDonation: Date
 });
 
 // Enhanced Request Schema
@@ -55,7 +84,11 @@ const requestSchema = new mongoose.Schema({
         donorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         status: { type: String, enum: ['pending', 'accepted', 'rejected'] }
     }],
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    bloodGroup: String,
+    urgencyLevel: String,
+    hospital: String,
+    requesterId: mongoose.Schema.Types.ObjectId
 });
 
 // Email configuration
@@ -189,9 +222,7 @@ app.get('/api/admin/statistics', auth, async (req, res) => {
 });
 
 // Socket.io setup
-const server = app.listen(PORT);
 const io = socket(server);
-
 io.on('connection', (socket) => {
     socket.on('join', (userId) => {
         socket.join(userId);
@@ -214,10 +245,65 @@ io.on('connection', (socket) => {
             }
         });
     });
+
+    socket.on('newBloodRequest', async (requestData) => {
+        // Save request to database
+        const request = new Request(requestData);
+        await request.save();
+
+        // Find matching donors
+        const matchingDonors = await User.find({
+            userType: 'donor',
+            bloodGroup: requestData.bloodGroup
+        });
+
+        // Notify matching donors
+        matchingDonors.forEach(donor => {
+            io.to(donor._id).emit('bloodRequest', {
+                ...requestData,
+                requestId: request._id
+            });
+        });
+    });
+
+    socket.on('acceptRequest', async (data) => {
+        const request = await Request.findById(data.requestId);
+        request.status = 'accepted';
+        request.donorId = data.donorId;
+        await request.save();
+
+        // Notify requester
+        io.to(request.requesterId).emit('requestAccepted', {
+            requestId: request._id,
+            donorDetails: await User.findById(data.donorId)
+        });
+    });
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5500;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-}); 
+});
+const server = app.listen(PORT);
+
+// Certificate generation and email sending
+async function sendDonationCertificate(donationData) {
+    const certificate = await generateCertificate(donationData);
+    
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: donationData.donorEmail,
+        subject: 'Blood Donation Certificate',
+        html: `
+            <h1>Thank you for your blood donation!</h1>
+            <p>Please find your donation certificate attached.</p>
+        `,
+        attachments: [{
+            filename: 'donation_certificate.pdf',
+            content: certificate
+        }]
+    };
+
+    await transporter.sendMail(mailOptions);
+} 
