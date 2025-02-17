@@ -1415,6 +1415,19 @@
                 // Update interface based on user type
                 updateInterface(userType);
 
+                // Scroll to appropriate form based on user type
+                if (userType === 'donor') {
+                    document.getElementById('donate').scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                } else {
+                    document.getElementById('request').scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+
                 // Show welcome message
                 showNotification(
                     'Welcome Back!', 
@@ -1430,23 +1443,29 @@
             const requestSection = document.getElementById('requestsList');
             const donateButton = document.getElementById('donateBtn');
             const requestButton = document.getElementById('requestBtn');
+            const donateFormSection = document.getElementById('donate');
+            const requestFormSection = document.getElementById('request');
 
             if (userType === 'donor') {
                 // Show only blood requests to donors
                 if (donorSection) donorSection.closest('.bg-white').classList.add('hidden');
                 if (requestSection) requestSection.closest('.bg-white').classList.remove('hidden');
                 
-                // Update buttons
+                // Update buttons and forms visibility
                 if (donateButton) donateButton.classList.remove('hidden');
                 if (requestButton) requestButton.classList.add('hidden');
+                if (donateFormSection) donateFormSection.classList.remove('hidden');
+                if (requestFormSection) requestFormSection.classList.add('hidden');
             } else if (userType === 'recipient') {
                 // Show only donor list to recipients
                 if (donorSection) donorSection.closest('.bg-white').classList.remove('hidden');
                 if (requestSection) requestSection.closest('.bg-white').classList.add('hidden');
                 
-                // Update buttons
+                // Update buttons and forms visibility
                 if (donateButton) donateButton.classList.add('hidden');
                 if (requestButton) requestButton.classList.remove('hidden');
+                if (donateFormSection) donateFormSection.classList.add('hidden');
+                if (requestFormSection) requestFormSection.classList.remove('hidden');
             }
 
             // Update navbar
@@ -1510,6 +1529,25 @@
                 currentUserType = savedUserType;
                 updateInterface(savedUserType);
             }
+        });
+    </script>
+
+    <!-- Add click handlers for donate and request buttons -->
+    <script>
+        document.getElementById('donateBtn').addEventListener('click', function() {
+            // Smooth scroll to donate form section
+            document.getElementById('donate').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+
+        document.getElementById('requestBtn').addEventListener('click', function() {
+            // Smooth scroll to request form section
+            document.getElementById('request').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
         });
     </script>
 </body>
