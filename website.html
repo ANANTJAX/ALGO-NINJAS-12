@@ -927,6 +927,7 @@
 
         // Function to mask phone number
         function maskPhoneNumber(phone) {
+            // Store the full number in the hospitals data structure
             return phone.slice(0, 4) + "XXXX" + phone.slice(-2);
         }
 
@@ -975,6 +976,9 @@
 
         // Function to show subscription prompt
         function showSubscriptionPrompt(requestId) {
+            // Store the requestId for later use
+            localStorage.setItem('pendingRequestId', requestId);
+            
             const subscriptionModal = document.createElement('div');
             subscriptionModal.className = 
                 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
@@ -1005,8 +1009,9 @@
 
         // Function to handle subscription
         function handleSubscription(plan) {
-            // Here you would implement your payment gateway integration
-            alert(`Thank you for choosing the ${plan} plan. Payment gateway integration would go here.`);
+            // Store the selected plan in localStorage or pass as URL parameter
+            localStorage.setItem('selectedPlan', plan);
+            window.location.href = 'payment.html';
         }
 
         // Add this CSS to your styles
@@ -1109,6 +1114,58 @@
                 }, 300);
             }, 5000);
         }
+    </script>
+
+    <!-- Add this to your existing script -->
+    <script>
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentSuccess = urlParams.get('payment');
+            const requestId = urlParams.get('request');
+            const showFullNumber = localStorage.getItem('showFullNumber');
+
+            if (paymentSuccess === 'success' && requestId && showFullNumber === 'true') {
+                // Find the request in hospitals data
+                let requestData;
+                for (const hospital in hospitals) {
+                    const request = hospitals[hospital].requests.find(req => req.requestId === requestId);
+                    if (request) {
+                        requestData = request;
+                        break;
+                    }
+                }
+
+                if (requestData) {
+                    // Show the full number in a modal
+                    const modal = document.createElement('div');
+                    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                    modal.innerHTML = `
+                        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                            <h3 class="text-xl font-bold mb-4">Contact Details</h3>
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-gray-600">Requester Name</p>
+                                    <p class="font-semibold">${requestData.contactName}</p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-gray-600">Contact Number</p>
+                                    <p class="font-semibold">${requestData.contactPhone}</p>
+                                </div>
+                                <button onclick="this.parentElement.parentElement.remove()" 
+                                    class="w-full bg-primary text-white py-2 rounded-lg hover:bg-secondary transition">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                }
+
+                // Clear the stored data
+                localStorage.removeItem('showFullNumber');
+                localStorage.removeItem('pendingRequestId');
+            }
+        });
     </script>
 </body>
 </html>

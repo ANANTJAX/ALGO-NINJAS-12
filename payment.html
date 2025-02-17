@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeLink - Secure Payment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Add Stripe.js for secure card handling -->
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body class="font-poppins bg-gray-50">
+    <div class="min-h-screen py-12">
+        <div class="container mx-auto px-4">
+            <!-- Payment Header -->
+            <div class="max-w-3xl mx-auto bg-white rounded-t-2xl shadow-sm p-6 border-b">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <a href="website.html" class="text-gray-400 hover:text-gray-500">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-2xl font-semibold text-gray-800">Secure Payment</h1>
+                    </div>
+                    <div class="flex items-center space-x-2 text-green-600">
+                        <i class="fas fa-lock"></i>
+                        <span class="text-sm">End-to-end encrypted</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Payment Content -->
+            <div class="max-w-3xl mx-auto bg-white rounded-b-2xl shadow-sm p-6">
+                <!-- Order Summary -->
+                <div class="mb-8 p-4 bg-gray-50 rounded-lg">
+                    <h2 class="text-lg font-semibold mb-4">Order Summary</h2>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-600" id="subscriptionPlan">Premium Subscription</p>
+                            <p class="text-sm text-gray-500" id="subscriptionDuration">Monthly Plan</p>
+                        </div>
+                        <p class="text-xl font-semibold text-primary" id="subscriptionPrice">₹99.00</p>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="space-y-6">
+                    <h2 class="text-lg font-semibold">Select Payment Method</h2>
+
+                    <!-- UPI Section -->
+                    <div class="border rounded-lg p-4">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="radio" name="paymentMethod" value="upi" class="text-primary">
+                            <span>UPI Payment</span>
+                        </label>
+                        <div class="upi-options hidden mt-4 space-y-4">
+                            <div class="grid grid-cols-4 gap-4">
+                                <button class="flex flex-col items-center p-3 border rounded-lg hover:border-primary transition-colors">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" 
+                                         alt="Paytm" class="w-8 h-8 mb-1">
+                                    <span class="text-xs">Paytm</span>
+                                </button>
+                                <button class="flex flex-col items-center p-3 border rounded-lg hover:border-primary transition-colors">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Google_Pay_%28GPay%29_Logo_%282018-2020%29.svg" 
+                                         alt="Google Pay" class="w-8 h-8 mb-1">
+                                    <span class="text-xs">Google Pay</span>
+                                </button>
+                                <button class="flex flex-col items-center p-3 border rounded-lg hover:border-primary transition-colors">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/PhonePe_Logo.svg" 
+                                         alt="PhonePe" class="w-8 h-8 mb-1">
+                                    <span class="text-xs">PhonePe</span>
+                                </button>
+                                <button class="flex flex-col items-center p-3 border rounded-lg hover:border-primary transition-colors">
+                                    <i class="fas fa-qrcode text-2xl mb-1"></i>
+                                    <span class="text-xs">Other UPI</span>
+                                </button>
+                            </div>
+                            <div class="mt-4">
+                                <input type="text" placeholder="Enter UPI ID (e.g., name@upi)" 
+                                    class="w-full px-4 py-3 rounded-lg border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Payment Section -->
+                    <div class="border rounded-lg p-4">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="radio" name="paymentMethod" value="card" class="text-primary">
+                            <span>Credit/Debit Card</span>
+                        </label>
+                        <div class="card-options hidden mt-4 space-y-4">
+                            <!-- Secure card input fields handled by Stripe -->
+                            <div id="card-element" class="p-4 border rounded-lg bg-gray-50">
+                                <!-- Stripe Card Element will be inserted here -->
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Your card details are securely encrypted</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Net Banking Section -->
+                    <div class="border rounded-lg p-4">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="radio" name="paymentMethod" value="netbanking" class="text-primary">
+                            <span>Net Banking</span>
+                        </label>
+                        <div class="netbanking-options hidden mt-4">
+                            <select class="w-full px-4 py-3 rounded-lg border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition"
+                                    aria-label="Select Bank">
+                                <option value="">Select Bank</option>
+                                <option value="sbi">State Bank of India</option>
+                                <option value="hdfc">HDFC Bank</option>
+                                <option value="icici">ICICI Bank</option>
+                                <option value="axis">Axis Bank</option>
+                                <!-- Add more banks as needed -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Button -->
+                <div class="mt-8">
+                    <button id="payButton" 
+                            class="w-full bg-primary text-white py-4 rounded-lg hover:bg-secondary transition-colors flex items-center justify-center space-x-2">
+                        <span>Pay Securely</span>
+                        <i class="fas fa-lock"></i>
+                    </button>
+                </div>
+
+                <!-- Security Badges -->
+                <div class="mt-6 flex items-center justify-center space-x-6 text-gray-400">
+                    <i class="fab fa-cc-visa text-2xl"></i>
+                    <i class="fab fa-cc-mastercard text-2xl"></i>
+                    <i class="fab fa-cc-amex text-2xl"></i>
+                    <i class="fab fa-cc-rupay text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Processing Modal -->
+    <div id="processingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto mb-4"></div>
+            <h3 class="text-lg font-semibold mb-2">Processing Payment</h3>
+            <p class="text-gray-600">Please do not close this window...</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Stripe
+        const stripe = Stripe('your_publishable_key'); // Replace with your Stripe publishable key
+        const elements = stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#32325d',
+                    fontFamily: '"Poppins", sans-serif',
+                    '::placeholder': {
+                        color: '#aab7c4'
+                    }
+                },
+                invalid: {
+                    color: '#fa755a',
+                    iconColor: '#fa755a'
+                }
+            }
+        });
+
+        // Mount the card element
+        cardElement.mount('#card-element');
+
+        // Handle payment method selection
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Hide all payment options
+                document.querySelectorAll('.upi-options, .card-options, .netbanking-options').forEach(el => {
+                    el.classList.add('hidden');
+                });
+                
+                // Show selected payment option
+                const selectedOption = document.querySelector(`.${this.value}-options`);
+                if (selectedOption) {
+                    selectedOption.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Handle payment submission
+        document.getElementById('payButton').addEventListener('click', async function() {
+            const processingModal = document.getElementById('processingModal');
+            processingModal.classList.remove('hidden');
+
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+            
+            try {
+                if (paymentMethod === 'card') {
+                    const {paymentMethod, error} = await stripe.createPaymentMethod({
+                        type: 'card',
+                        card: cardElement,
+                    });
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    // Send paymentMethod.id to your server
+                    // await processPayment(paymentMethod.id);
+                } else if (paymentMethod === 'upi') {
+                    // Handle UPI payment
+                    const upiId = document.querySelector('input[placeholder="Enter UPI ID"]').value;
+                    // Process UPI payment
+                } else if (paymentMethod === 'netbanking') {
+                    // Handle net banking payment
+                    const bank = document.querySelector('select').value;
+                    // Process net banking payment
+                }
+
+                // Simulate payment processing
+                setTimeout(() => {
+                    processingModal.classList.add('hidden');
+                    showSuccessNotification();
+                    // Redirect to success page or show success message
+                }, 2000);
+
+            } catch (error) {
+                processingModal.classList.add('hidden');
+                alert(error.message);
+            }
+        });
+
+        // Get subscription details from localStorage
+        const selectedPlan = localStorage.getItem('selectedPlan');
+        const pendingRequestId = localStorage.getItem('pendingRequestId');
+
+        // Update order summary based on selected plan
+        const subscriptionPlan = document.getElementById('subscriptionPlan');
+        const subscriptionDuration = document.getElementById('subscriptionDuration');
+        const subscriptionPrice = document.getElementById('subscriptionPrice');
+
+        if (selectedPlan === 'monthly') {
+            subscriptionDuration.textContent = 'Monthly Plan';
+            subscriptionPrice.textContent = '₹99.00';
+        } else if (selectedPlan === 'yearly') {
+            subscriptionDuration.textContent = 'Yearly Plan';
+            subscriptionPrice.textContent = '₹999.00';
+        }
+
+        // Update success notification function
+        function showSuccessNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-md transform transition-all duration-300';
+            notification.innerHTML = `
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-gray-900">Payment Successful</h3>
+                        <p class="text-gray-600 mt-1">Your subscription has been activated!</p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+
+            // Store subscription status
+            localStorage.setItem('subscriptionActive', 'true');
+            localStorage.setItem('subscriptionExpiry', new Date(Date.now() + (selectedPlan === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000).toISOString());
+
+            setTimeout(() => {
+                notification.remove();
+                // Redirect back with success parameter
+                window.location.href = `website.html?payment=success&request=${pendingRequestId}`;
+            }, 3000);
+        }
+
+        // Add this to the payment button click handler
+        document.getElementById('payButton').addEventListener('click', async function() {
+            // ... existing payment processing code ...
+
+            // After successful payment, show the full number
+            if (pendingRequestId) {
+                // The full number will be shown back on the main page
+                localStorage.setItem('showFullNumber', 'true');
+            }
+        });
+    </script>
+</body>
+</html> 
