@@ -440,4 +440,162 @@ footer {
 
 .notification-popup button:hover {
     background-color: var(--secondary-color);
+}
+
+/* Enhanced Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .donor-card {
+        flex-direction: column;
+    }
+
+    .donor-card button {
+        margin-top: 1rem;
+        width: 100%;
+    }
+
+    .notification-popup {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+        max-width: none;
+    }
+}
+
+/* Animation for notifications */
+@keyframes slideIn {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-slideIn {
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Enhanced form accessibility */
+select, input, button {
+    @apply focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-200;
+}
+
+.donor-card {
+    @apply transform transition-all duration-200 hover:scale-[1.02] hover:shadow-md;
+}
+
+/* Loading states */
+.loading {
+    @apply relative pointer-events-none opacity-75;
+}
+
+.loading::after {
+    content: '';
+    @apply absolute inset-0 bg-white/40 flex items-center justify-center;
+}
+
+/* Real-time status indicators */
+.connection-status {
+    transition: all 0.3s ease;
+}
+
+/* Card animations */
+.donor-card, .request-card {
+    transition: transform 0.2s ease;
+}
+
+.donor-card:hover, .request-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Badge styles */
+.blood-type-badge, .urgency-badge {
+    transition: all 0.2s ease;
+}
+
+/* Button animations */
+.connect-btn, .respond-btn {
+    transition: all 0.2s ease;
+}
+
+.connect-btn:hover, .respond-btn:hover {
+    transform: scale(1.05);
+}
+
+/* List animations */
+.donor-card, .request-card {
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-feedback {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.form-feedback.show {
+    opacity: 1;
+}
+
+.form-success {
+    background-color: #10B981;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+
+.form-error {
+    background-color: #EF4444;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+
+.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#activeRequests {
+    z-index: 40;
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+#requestsList > div {
+    transition: all 0.3s ease;
+}
+
+#requestsList > div:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 } 

@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Form elements
     const donorForm = document.getElementById('donorForm');
-    const requestForm = document.getElementById('requestForm');
+    const requestForm = document.getElementById('bloodRequestForm');
     const donateBtn = document.getElementById('donateBtn');
     const requestBtn = document.getElementById('requestBtn');
 
@@ -93,32 +93,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Handle donor form submission
-    donorForm.addEventListener('submit', function(e) {
+    donorForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // Use Geolocation API to get current location
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
+            navigator.geolocation.getCurrentPosition(async function(position) {
                 const donorData = {
                     fullName: donorForm.querySelector('input[placeholder="Full Name"]').value,
-                    bloodType: donorForm.querySelector('select[name="bloodGroup"]').value,
-                    phoneNumber: donorForm.querySelector('input[placeholder="Phone Number"]').value,
                     email: donorForm.querySelector('input[placeholder="Email"]').value,
+                    phoneNumber: donorForm.querySelector('input[placeholder="Phone Number"]').value,
+                    bloodType: donorForm.querySelector('select[name="bloodType"]').value,
                     locationLat: position.coords.latitude,
                     locationLng: position.coords.longitude,
-                    isAvailable: true, // Default to available
-                    registrationDate: new Date().toLocaleDateString(),
-                    registrationId: 'BD' + Date.now().toString().slice(-6)
+                    preferredHospital: donorForm.querySelector('select[name="hospital"]').value
                 };
 
-                // Store donor data in local storage
-                localStorage.setItem('donorData', JSON.stringify(donorData));
-
-                // Initialize map with donor location
-                initMap();
-
-                // Check for matching patient
-                checkForMatch(donorData);
+                try {
+                    const response = await fetch('/api/donors', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(donorData)
+                    });
+                    const result = await response.json();
+                    console.log('Donor registered:', result);
+                } catch (error) {
+                    console.error('Error registering donor:', error);
+                }
             });
         } else {
             alert('Geolocation is not supported by this browser.');
@@ -126,21 +126,26 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Handle request form submission
-    requestForm.addEventListener('submit', function(e) {
+    requestForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // Capture patient data
         const patientData = {
-            patientName: requestForm.querySelector('input[placeholder="Patient Name"]').value,
-            bloodType: requestForm.querySelector('select[name="bloodType"]').value,
-            hospital: requestForm.querySelector('input[placeholder="Hospital Location"]').value
+            bloodGroup: requestForm.querySelector('select[name="bloodGroup"]').value,
+            urgencyLevel: requestForm.querySelector('select[name="urgencyLevel"]').value,
+            hospital: requestForm.querySelector('select[name="hospital"]').value
         };
 
-        // Store patient data in local storage
-        localStorage.setItem('patientData', JSON.stringify(patientData));
-
-        // Check for matching donor
-        checkForMatch(null, patientData);
+        try {
+            const response = await fetch('/api/patients', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(patientData)
+            });
+            const result = await response.json();
+            console.log('Patient request submitted:', result);
+        } catch (error) {
+            console.error('Error submitting patient request:', error);
+        }
     });
 
     // Function to check for matches
@@ -152,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
             patientData = JSON.parse(localStorage.getItem('patientData'));
         }
 
-        if (donorData && patientData && donorData.bloodType === patientData.bloodType) {
+        if (donorData && patientData && donorData.bloodType === patientData.bloodGroup) {
             // Display notification popup
             showNotificationPopup(donorData, patientData);
         }
@@ -165,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         notificationDiv.innerHTML = `
             <h4 class="font-bold text-primary">Match Found!</h4>
             <p>Donor: ${donorData.fullName} (${donorData.bloodType})</p>
-            <p>Patient: ${patientData.patientName} (${patientData.bloodType})</p>
+            <p>Patient: ${patientData.patientName} (${patientData.bloodGroup})</p>
             <p>Hospital: ${patientData.hospital}</p>
             <button class="mt-2 bg-primary text-white py-1 px-3 rounded" onclick="startChat()">Connect</button>
         `;
@@ -306,7 +311,7 @@ function generateCertificate(donorData, patientData) {
 
     // Add patient details
     doc.text(`Patient Name: ${patientData.patientName}`, 20, 180);
-    doc.text(`Patient Blood Type: ${patientData.bloodType}`, 20, 190);
+    doc.text(`Patient Blood Type: ${patientData.bloodGroup}`, 20, 190);
     doc.text(`Hospital: ${patientData.hospital}`, 20, 200);
 
     // Add fake signature
@@ -502,4 +507,460 @@ function updateDonorAvailability(isAvailable) {
     donorMarker.setIcon({
         url: isAvailable ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
     });
+}
+
+// Add this function to handle geolocation
+function initializeGeolocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                document.getElementById('locationLat').value = position.coords.latitude;
+                document.getElementById('locationLng').value = position.coords.longitude;
+                
+                // Show success message
+                const locationStatus = document.getElementById('locationStatus');
+                locationStatus.textContent = '📍 Location captured successfully';
+                locationStatus.classList.remove('text-red-500');
+                locationStatus.classList.add('text-green-500');
+            },
+            (error) => {
+                const locationStatus = document.getElementById('locationStatus');
+                locationStatus.textContent = '❌ Please enable location access';
+                locationStatus.classList.add('text-red-500');
+            }
+        );
+    }
+}
+
+// Add real-time matching functionality
+function findNearbyDonors(patientData) {
+    const maxDistance = 10; // km
+    
+    return fetch('/api/donors/nearby', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            bloodGroup: patientData.bloodGroup,
+            hospital: patientData.hospital,
+            urgencyLevel: patientData.urgencyLevel,
+            maxDistance
+        })
+    })
+    .then(response => response.json())
+    .then(donors => {
+        if (donors.length > 0) {
+            showMatchNotification(donors, patientData);
+        } else {
+            showNoMatchMessage();
+        }
+    });
+}
+
+// Enhanced notification system
+function showMatchNotification(donors, patientData) {
+    const notificationDiv = document.createElement('div');
+    notificationDiv.className = 'fixed bottom-4 right-4 bg-white p-6 rounded-lg shadow-xl border-l-4 border-primary max-w-md animate-slideIn';
+    
+    const donorsList = donors.map(donor => `
+        <div class="donor-card mb-4 p-4 bg-gray-50 rounded-lg">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h4 class="font-semibold">${donor.fullName}</h4>
+                    <p class="text-sm text-gray-600">Blood Type: ${donor.bloodType}</p>
+                </div>
+                <button onclick="connectWithDonor('${donor._id}')" 
+                    class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
+                    Connect
+                </button>
+            </div>
+        </div>
+    `).join('');
+
+    notificationDiv.innerHTML = `
+        <h3 class="text-lg font-bold mb-4">Matching Donors Found</h3>
+        <div class="max-h-60 overflow-y-auto">
+            ${donorsList}
+        </div>
+    `;
+
+    document.body.appendChild(notificationDiv);
+}
+
+// Add validation for the health questionnaire
+function validateHealthQuestionnaire(formData) {
+    // Weight validation (minimum 50kg for donors)
+    if (formData.get('weight') < 50) {
+        alert('Minimum weight requirement for blood donation is 50kg');
+        return false;
+    }
+
+    // Age validation (18-65 years)
+    const birthDate = new Date(formData.get('birthDate'));
+    const age = calculateAge(birthDate);
+    if (age < 18 || age > 65) {
+        alert('Blood donors must be between 18 and 65 years of age');
+        return false;
+    }
+
+    // Check for recent medical procedures
+    if (formData.get('recentProcedures').includes('tattoo') || 
+        formData.get('recentProcedures').includes('dental_extraction')) {
+        const procedureDate = new Date(formData.get('procedureDate'));
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        
+        if (procedureDate > sixMonthsAgo) {
+            alert('You must wait 6 months after getting a tattoo or dental extraction');
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function calculateAge(birthDate) {
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    
+    return age;
+}
+
+class BloodDonationSystem {
+    constructor() {
+        this.donors = new Map();
+        this.requests = new Map();
+        this.initializeStorage();
+        this.setupEventListeners();
+        this.initializeRequestsList();
+    }
+
+    initializeRequestsList() {
+        // Create requests container if it doesn't exist
+        if (!document.getElementById('activeRequests')) {
+            const requestsContainer = document.createElement('div');
+            requestsContainer.id = 'activeRequests';
+            requestsContainer.className = 'fixed top-24 right-4 w-80 bg-white rounded-lg shadow-xl p-4 max-h-[80vh] overflow-y-auto';
+            requestsContainer.innerHTML = `
+                <h3 class="text-lg font-bold mb-4 text-primary">Active Blood Requests</h3>
+                <div id="requestsList" class="space-y-4"></div>
+            `;
+            document.body.appendChild(requestsContainer);
+        }
+        
+        // Load and display existing requests
+        const storedRequests = localStorage.getItem('requests');
+        if (storedRequests) {
+            JSON.parse(storedRequests).forEach(request => {
+                this.displayRequest(request);
+            });
+        }
+    }
+
+    initializeStorage() {
+        const storedDonors = localStorage.getItem('donors');
+        const storedRequests = localStorage.getItem('requests');
+        
+        if (storedDonors) {
+            JSON.parse(storedDonors).forEach(donor => {
+                this.donors.set(donor.id, donor);
+            });
+        }
+        
+        if (storedRequests) {
+            JSON.parse(storedRequests).forEach(request => {
+                this.requests.set(request.id, request);
+            });
+        }
+    }
+
+    setupEventListeners() {
+        // Donor form submission
+        const donorForm = document.getElementById('donorForm');
+        donorForm?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleDonorSubmission(new FormData(donorForm));
+        });
+
+        // Request form submission
+        const requestForm = document.getElementById('bloodRequestForm');
+        requestForm?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleRequestSubmission(new FormData(requestForm));
+        });
+    }
+
+    handleDonorSubmission(formData) {
+        const donor = {
+            id: Date.now().toString(),
+            name: formData.get('fullName'),
+            email: formData.get('email'),
+            phone: formData.get('phoneNumber'),
+            bloodType: formData.get('bloodType'),
+            available: true,
+            timestamp: new Date().toISOString()
+        };
+
+        this.donors.set(donor.id, donor);
+        this.saveDonors();
+        this.updateDonorsList();
+        this.showSuccessMessage('Thank you for registering as a donor!');
+    }
+
+    handleRequestSubmission(formData) {
+        const request = {
+            id: Date.now().toString(),
+            bloodType: formData.get('bloodType'),
+            hospital: formData.get('hospital'),
+            contactName: formData.get('contactName'),
+            contactPhone: formData.get('contactPhone'),
+            timestamp: new Date().toISOString(),
+            status: 'active'
+        };
+
+        this.requests.set(request.id, request);
+        this.saveRequests();
+        this.displayRequest(request);
+        this.findMatchingDonors(request);
+        this.showSuccessMessage('Blood request submitted successfully!');
+    }
+
+    findMatchingDonors(request) {
+        const matches = Array.from(this.donors.values()).filter(donor => 
+            donor.bloodType === request.bloodType && donor.available
+        );
+
+        if (matches.length > 0) {
+            this.showMatchNotification(matches, request);
+        } else {
+            this.showNoMatchMessage();
+        }
+    }
+
+    showMatchNotification(donors, request) {
+        const notificationDiv = document.createElement('div');
+        notificationDiv.className = 'fixed bottom-4 right-4 bg-white p-6 rounded-lg shadow-xl border-l-4 border-primary max-w-md animate-slideIn';
+        
+        const donorsList = donors.map(donor => `
+            <div class="donor-card mb-4 p-4 bg-gray-50 rounded-lg">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h4 class="font-semibold">${donor.name}</h4>
+                        <p class="text-sm text-gray-600">Blood Type: ${donor.bloodType}</p>
+                    </div>
+                    <button onclick="window.bloodDonationSystem.connectWithDonor('${donor.id}')" 
+                        class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
+                        Contact
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        notificationDiv.innerHTML = `
+            <h3 class="text-lg font-bold mb-4">Matching Donors Found</h3>
+            <div class="max-h-60 overflow-y-auto">
+                ${donorsList}
+            </div>
+        `;
+
+        document.body.appendChild(notificationDiv);
+    }
+
+    connectWithDonor(donorId) {
+        const donor = this.donors.get(donorId);
+        if (donor) {
+            const contactDiv = document.createElement('div');
+            contactDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
+            contactDiv.innerHTML = `
+                <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+                    <h3 class="text-lg font-bold mb-4">Contact Donor</h3>
+                    <p class="mb-2">Name: ${donor.name}</p>
+                    <p class="mb-2">Phone: ${donor.phone}</p>
+                    <p class="mb-4">Email: ${donor.email}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                        class="bg-primary text-white px-4 py-2 rounded-lg w-full">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(contactDiv);
+        }
+    }
+
+    saveDonors() {
+        localStorage.setItem('donors', JSON.stringify(Array.from(this.donors.values())));
+    }
+
+    saveRequests() {
+        localStorage.setItem('requests', JSON.stringify(Array.from(this.requests.values())));
+    }
+
+    updateDonorsList() {
+        // Implementation of updateDonorsList method
+    }
+
+    updateRequestsList() {
+        // Implementation of updateRequestsList method
+    }
+
+    showSuccessMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'fixed bottom-4 left-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-lg animate-slideIn';
+        messageDiv.innerHTML = message;
+        document.body.appendChild(messageDiv);
+        
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 3000);
+    }
+
+    showNoMatchMessage() {
+        // Implementation of showNoMatchMessage method
+    }
+
+    displayRequest(request) {
+        const requestsList = document.getElementById('requestsList');
+        const requestElement = document.createElement('div');
+        requestElement.id = `request-${request.id}`;
+        requestElement.className = 'bg-gray-50 p-4 rounded-lg shadow border-l-4 border-primary animate-slideIn';
+        
+        requestElement.innerHTML = `
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="inline-block px-2 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-2">
+                        ${request.bloodType}
+                    </span>
+                    <h4 class="font-medium">${request.hospital}</h4>
+                    <p class="text-sm text-gray-600">Contact: ${request.contactName}</p>
+                    <p class="text-sm text-gray-600">Posted: ${this.formatTimeAgo(request.timestamp)}</p>
+                </div>
+                ${request.status === 'active' ? `
+                    <button onclick="bloodDonationSystem.respondToRequest('${request.id}')"
+                        class="px-3 py-1 bg-primary text-white rounded-lg text-sm hover:bg-secondary transition">
+                        Respond
+                    </button>
+                ` : `
+                    <span class="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg text-sm">
+                        Fulfilled
+                    </span>
+                `}
+            </div>
+        `;
+        
+        // Add to the beginning of the list
+        if (requestsList.firstChild) {
+            requestsList.insertBefore(requestElement, requestsList.firstChild);
+        } else {
+            requestsList.appendChild(requestElement);
+        }
+    }
+
+    respondToRequest(requestId) {
+        const request = this.requests.get(requestId);
+        if (request) {
+            const contactDiv = document.createElement('div');
+            contactDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            contactDiv.innerHTML = `
+                <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+                    <h3 class="text-lg font-bold mb-4">Contact Information</h3>
+                    <p class="mb-2">Patient Contact: ${request.contactName}</p>
+                    <p class="mb-2">Phone: ${request.contactPhone}</p>
+                    <p class="mb-4">Hospital: ${request.hospital}</p>
+                    <div class="space-y-2">
+                        <button onclick="bloodDonationSystem.confirmDonation('${requestId}')" 
+                            class="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
+                            Confirm Donation
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                            class="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(contactDiv);
+        }
+    }
+
+    confirmDonation(requestId) {
+        const request = this.requests.get(requestId);
+        if (request) {
+            request.status = 'fulfilled';
+            this.saveRequests();
+            
+            // Update the request display
+            const requestElement = document.getElementById(`request-${requestId}`);
+            if (requestElement) {
+                requestElement.querySelector('button').outerHTML = `
+                    <span class="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg text-sm">
+                        Fulfilled
+                    </span>
+                `;
+            }
+            
+            this.showSuccessMessage('Thank you for donating blood!');
+            
+            // Close the contact modal
+            const modal = document.querySelector('.fixed.inset-0');
+            if (modal) modal.remove();
+        }
+    }
+
+    formatTimeAgo(timestamp) {
+        const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
+        
+        const intervals = {
+            year: 31536000,
+            month: 2592000,
+            week: 604800,
+            day: 86400,
+            hour: 3600,
+            minute: 60
+        };
+        
+        for (let [unit, secondsInUnit] of Object.entries(intervals)) {
+            const interval = Math.floor(seconds / secondsInUnit);
+            if (interval >= 1) {
+                return `${interval} ${unit}${interval === 1 ? '' : 's'} ago`;
+            }
+        }
+        
+        return 'Just now';
+    }
+}
+
+// Initialize the system
+const bloodDonationSystem = new BloodDonationSystem();
+
+class BloodDonationFilter {
+    constructor(system) {
+        this.system = system;
+        this.setupFilters();
+    }
+
+    setupFilters() {
+        const bloodTypeFilter = document.getElementById('bloodTypeFilter');
+        const locationFilter = document.getElementById('locationFilter');
+
+        bloodTypeFilter.addEventListener('change', () => this.applyFilters());
+        locationFilter.addEventListener('input', () => this.applyFilters());
+    }
+
+    applyFilters() {
+        const bloodType = document.getElementById('bloodTypeFilter').value;
+        const location = document.getElementById('locationFilter').value.toLowerCase();
+
+        const filteredDonors = Array.from(this.system.donors.values()).filter(donor => {
+            const matchesBloodType = !bloodType || donor.bloodType === bloodType;
+            const matchesLocation = !location || 
+                donor.location.toLowerCase().includes(location);
+            return matchesBloodType && matchesLocation;
+        });
+
+        this.system.updateDonorsList(filteredDonors);
+    }
 } 
