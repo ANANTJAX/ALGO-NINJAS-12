@@ -63,6 +63,27 @@
                     <p class="text-gray-500 mt-1">Please login to continue</p>
                 </div>
 
+                <!-- User Type Selection -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-2">I am a:</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="flex items-center justify-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors group">
+                            <input type="radio" name="userType" value="donor" required class="hidden">
+                            <div class="text-center">
+                                <i class="fas fa-hand-holding-heart text-2xl mb-2 text-gray-400 group-hover:text-primary"></i>
+                                <p class="font-medium">Blood Donor</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center justify-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors group">
+                            <input type="radio" name="userType" value="recipient" required class="hidden">
+                            <div class="text-center">
+                                <i class="fas fa-user-injured text-2xl mb-2 text-gray-400 group-hover:text-primary"></i>
+                                <p class="font-medium">Blood Recipient</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Login form -->
                 <form id="loginForm" class="space-y-4">
                     <div class="relative">
@@ -78,13 +99,6 @@
                         </div>
                         <input type="password" placeholder="Password" required
                             class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <label class="flex items-center space-x-2 text-gray-600">
-                            <input type="checkbox" class="rounded text-primary focus:ring-primary">
-                            <span>Remember me</span>
-                        </label>
-                        <a href="#" class="text-primary hover:text-secondary">Forgot password?</a>
                     </div>
                     <button type="submit"
                         class="w-full bg-primary text-white py-3 rounded-lg hover:bg-secondary transition duration-300 font-medium flex items-center justify-center space-x-2 group">
@@ -1164,6 +1178,337 @@
                 // Clear the stored data
                 localStorage.removeItem('showFullNumber');
                 localStorage.removeItem('pendingRequestId');
+            }
+        });
+    </script>
+
+    <!-- Add this right after the existing script tags
+    <script>
+        // Emergency Request Handler
+        document.getElementById('emergencyBtn').addEventListener('click', function() {
+            // Create emergency modal
+            const emergencyModal = document.createElement('div');
+            emergencyModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm';
+            emergencyModal.innerHTML = `
+                <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 animate-fadeIn">
+                    <div class="relative">
+                        // Emergency Header
+                        <div class="text-center mb-6">
+                            <div class="inline-block p-3 bg-red-100 rounded-full mb-4">
+                                <i class="fas fa-ambulance text-3xl text-red-600 animate-pulse"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-800">Emergency Blood Request</h2>
+                            <p class="text-red-600 text-sm mt-1">This request will be marked as urgent</p>
+                        </div>
+
+                        // Quick Form
+                        <form id="emergencyRequestForm" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-1">Blood Type Needed*</label>
+                                    <select name="bloodType" required class="w-full px-4 py-2 rounded-lg border border-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                                        aria-label="Emergency Blood Type Selection">
+                                        <option value="">Select Type</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-1">Units Required*</label>
+                                    <input type="number" min="1" max="10" required
+                                        class="w-full px-4 py-2 rounded-lg border border-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                                        placeholder="No. of units">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-1">Hospital*</label>
+                                <select name="hospital" required class="w-full px-4 py-2 rounded-lg border border-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                                    aria-label="Emergency Hospital Selection">
+                                    <option value="">Select Hospital</option>
+                                    <option value="AIIMS">AIIMS Hospital</option>
+                                    <option value="Fortis">Fortis Hospital</option>
+                                    <option value="Apollo">Apollo Hospital</option>
+                                    <option value="Max">Max Healthcare</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-1">Contact Name*</label>
+                                    <input type="text" required
+                                        class="w-full px-4 py-2 rounded-lg border border-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                                        placeholder="Your name">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-1">Contact Phone*</label>
+                                    <input type="tel" required
+                                        class="w-full px-4 py-2 rounded-lg border border-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                                        placeholder="Your phone">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-1">Emergency Details</label>
+                                <textarea
+                                    class="w-full px-4 py-2 rounded-lg border border-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                                    placeholder="Brief description of emergency (optional)"
+                                    rows="2"></textarea>
+                            </div>
+
+                            <div class="flex items-center space-x-4">
+                                <button type="submit"
+                                    class="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition duration-300 flex items-center justify-center space-x-2">
+                                    <i class="fas fa-bolt"></i>
+                                    <span>Submit Emergency Request</span>
+                                </button>
+                                <button type="button" onclick="this.closest('.fixed').remove()"
+                                    class="px-4 py-3 text-gray-500 hover:text-gray-700 transition-colors">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(emergencyModal);
+
+            // Handle emergency form submission
+            document.getElementById('emergencyRequestForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    bloodType: this.querySelector('[name="bloodType"]').value,
+                    units: this.querySelector('input[type="number"]').value,
+                    hospital: this.querySelector('[name="hospital"]').value,
+                    contactName: this.querySelector('input[type="text"]').value,
+                    contactPhone: this.querySelector('input[type="tel"]').value,
+                    details: this.querySelector('textarea').value,
+                    timestamp: new Date(),
+                    requestId: 'EMERG-' + Math.random().toString(36).substr(2, 9),
+                    isEmergency: true
+                };
+
+                // Create emergency request card with priority styling
+                const requestCard = document.createElement('div');
+                requestCard.className = 'bg-red-50 rounded-lg shadow p-4 mb-4 border-l-4 border-red-600 animate-pulse';
+                requestCard.id = formData.requestId;
+                requestCard.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-red-600 text-white px-2 py-1 rounded-full text-xs">EMERGENCY</span>
+                                <h4 class="font-semibold text-red-600">${formData.contactName}</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">
+                                <span class="font-medium">Blood Type: ${formData.bloodType}</span> • 
+                                <span>${formData.units} units needed</span> •
+                                <span>${formData.hospital}</span>
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                Contact: ${maskPhoneNumber(formData.contactPhone)}
+                                <button onclick="showSubscriptionPrompt('${formData.requestId}')" 
+                                    class="ml-2 text-red-600 hover:text-red-700 text-xs">
+                                    View Full Number
+                                </button>
+                            </p>
+                            ${formData.details ? `<p class="text-sm text-gray-600 mt-2">${formData.details}</p>` : ''}
+                            <p class="text-xs text-red-600 mt-2">
+                                <i class="fas fa-clock"></i> Urgent: Expires in 
+                                <span class="countdown-${formData.requestId}">60:00</span>
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                // Add to requests list with priority
+                const requestsList = document.getElementById('requestsList');
+                if (requestsList) {
+                    requestsList.insertBefore(requestCard, requestsList.firstChild);
+                }
+
+                // Set shorter expiry for emergency requests (1 hour)
+                setTimeout(() => {
+                    deleteRequest(formData.requestId, formData.hospital);
+                }, 60 * 60 * 1000);
+
+                // Start countdown
+                startEmergencyCountdown(formData.requestId);
+
+                // Show notification to all active donors
+                showEmergencyNotification(formData);
+
+                // Close modal
+                emergencyModal.remove();
+
+                // Show success message
+                showNotification(
+                    'Emergency Request Submitted', 
+                    'Your emergency request has been sent to all nearby donors',
+                    'red'
+                );
+            });
+        });
+
+        // Emergency countdown function
+        function startEmergencyCountdown(requestId) {
+            let timeLeft = 60 * 60; // 1 hour in seconds
+            const countdownElement = document.querySelector(`.countdown-${requestId}`);
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    return;
+                }
+
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                countdownElement.textContent = 
+                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Emergency notification function
+        function showEmergencyNotification(requestData) {
+            // This would typically integrate with a push notification service
+            console.log('Emergency request notification sent to nearby donors:', requestData);
+        }
+    </script>
+
+    <!-- Add this script to handle login and interface switching -->
+    <script>
+        // Store user type and authentication state
+        let currentUserType = null;
+        let isAuthenticated = false;
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = this.querySelector('input[type="email"]').value;
+            const password = this.querySelector('input[type="password"]').value;
+            const userType = document.querySelector('input[name="userType"]:checked')?.value;
+
+            if (!userType) {
+                alert('Please select whether you are a donor or recipient');
+                return;
+            }
+
+            // Simulate authentication (replace with actual authentication)
+            if (email && password) {
+                isAuthenticated = true;
+                currentUserType = userType;
+                localStorage.setItem('userType', userType);
+                localStorage.setItem('isAuthenticated', 'true');
+
+                // Close login modal
+                document.getElementById('loginModal').classList.add('hidden');
+
+                // Update interface based on user type
+                updateInterface(userType);
+
+                // Show welcome message
+                showNotification(
+                    'Welcome Back!', 
+                    `You are logged in as a blood ${userType}`,
+                    'green'
+                );
+            }
+        });
+
+        // Function to update interface based on user type
+        function updateInterface(userType) {
+            const donorSection = document.getElementById('donorsList');
+            const requestSection = document.getElementById('requestsList');
+            const donateButton = document.getElementById('donateBtn');
+            const requestButton = document.getElementById('requestBtn');
+
+            if (userType === 'donor') {
+                // Show only blood requests to donors
+                if (donorSection) donorSection.closest('.bg-white').classList.add('hidden');
+                if (requestSection) requestSection.closest('.bg-white').classList.remove('hidden');
+                
+                // Update buttons
+                if (donateButton) donateButton.classList.remove('hidden');
+                if (requestButton) requestButton.classList.add('hidden');
+            } else if (userType === 'recipient') {
+                // Show only donor list to recipients
+                if (donorSection) donorSection.closest('.bg-white').classList.remove('hidden');
+                if (requestSection) requestSection.closest('.bg-white').classList.add('hidden');
+                
+                // Update buttons
+                if (donateButton) donateButton.classList.add('hidden');
+                if (requestButton) requestButton.classList.remove('hidden');
+            }
+
+            // Update navbar
+            updateNavbar(userType);
+        }
+
+        // Function to update navbar based on user type
+        function updateNavbar(userType) {
+            const navbar = document.querySelector('nav');
+            const userTypeIndicator = document.createElement('div');
+            userTypeIndicator.className = 'flex items-center space-x-2 text-primary';
+            userTypeIndicator.innerHTML = `
+                <i class="fas ${userType === 'donor' ? 'fa-hand-holding-heart' : 'fa-user-injured'}"></i>
+                <span class="text-sm font-medium">${userType === 'donor' ? 'Donor' : 'Recipient'}</span>
+            `;
+
+            // Add user type indicator to navbar
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        ${userTypeIndicator.outerHTML}
+                        <button onclick="logout()" class="text-sm text-gray-500 hover:text-primary">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Function to handle logout
+        function logout() {
+            isAuthenticated = false;
+            currentUserType = null;
+            localStorage.removeItem('userType');
+            localStorage.removeItem('isAuthenticated');
+            
+            // Reset interface
+            updateInterface(null);
+            
+            // Show login button
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.innerHTML = `
+                    <i class="fas fa-user-circle text-sm group-hover:rotate-12 transition-transform"></i>
+                    <span class="login-text">Login</span>
+                `;
+            }
+
+            // Show logout message
+            showNotification('Logged Out', 'You have been successfully logged out', 'blue');
+        }
+
+        // Check for existing login on page load
+        window.addEventListener('load', function() {
+            const savedUserType = localStorage.getItem('userType');
+            const savedAuth = localStorage.getItem('isAuthenticated');
+
+            if (savedAuth === 'true' && savedUserType) {
+                isAuthenticated = true;
+                currentUserType = savedUserType;
+                updateInterface(savedUserType);
             }
         });
     </script>
