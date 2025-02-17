@@ -631,7 +631,7 @@
                             placeholder="Enter contact phone number">
                     </div>
 
-                    <button type="submit"
+                    <button type="submit" id="responseButton"
                         class="w-full bg-primary text-white py-4 rounded-lg hover:bg-secondary transition">
                         Submit Request
                     </button>
@@ -824,6 +824,291 @@
         script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAcKuis4tI1ZMdrkUF_0pChrfuL1HkQdFo&callback=initMap`;
         script.defer = true;
         document.head.appendChild(script);
+    </script>
+
+    <!-- Add this right before the closing body tag -->
+    <script>
+        // Hospital data with their requests
+        const hospitals = {
+            'AIIMS': { name: 'AIIMS Hospital', requests: [] },
+            'Fortis': { name: 'Fortis Hospital', requests: [] },
+            'Apollo': { name: 'Apollo Hospital', requests: [] },
+            'Max': { name: 'Max Healthcare', requests: [] }
+        };
+
+        // Modify the blood request form handler
+        document.getElementById('bloodRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                bloodType: this.querySelector('[name="bloodType"]').value,
+                hospital: this.querySelector('[name="hospital"]').value,
+                contactName: this.querySelector('[name="contactName"]').value,
+                contactPhone: this.querySelector('[name="contactPhone"]').value,
+                timestamp: new Date(),
+                requestId: 'REQ-' + Math.random().toString(36).substr(2, 9)
+            };
+
+            // Validate form data
+            if (!formData.bloodType || !formData.hospital || !formData.contactName || !formData.contactPhone) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Mask phone number
+            const maskedPhone = maskPhoneNumber(formData.contactPhone);
+
+            // Create request card
+            const requestCard = createRequestCard(formData, maskedPhone);
+
+            // Add to hospital's requests
+            if (hospitals[formData.hospital]) {
+                hospitals[formData.hospital].requests.push(formData);
+            }
+
+            // Add the request card to the requests list
+            const requestsList = document.getElementById('requestsList');
+            if (requestsList) {
+                requestsList.insertBefore(requestCard, requestsList.firstChild);
+            }
+
+            // Set auto-delete timer (15 minutes)
+            setTimeout(() => {
+                deleteRequest(formData.requestId, formData.hospital);
+            }, 15 * 60 * 1000); // 15 minutes
+
+            // Clear the form
+            this.reset();
+
+            // Show success message
+            showNotification('Request Submitted', 'Your blood request has been successfully registered');
+        });
+
+        // Function to create request card
+        function createRequestCard(data, maskedPhone) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-lg shadow p-4 mb-4';
+            card.id = data.requestId;
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-semibold">${data.contactName}</h4>
+                        <p class="text-sm text-gray-600">
+                            Blood Type: ${data.bloodType} • Hospital: ${data.hospital}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            Contact: ${maskedPhone}
+                            <button onclick="showSubscriptionPrompt('${data.requestId}')" 
+                                class="ml-2 text-primary hover:text-secondary text-xs">
+                                View Full Number
+                            </button>
+                        </p>
+                        <p class="text-xs text-gray-400 mt-1">
+                            Expires in: <span class="countdown-${data.requestId}">15:00</span>
+                        </p>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                            ${data.bloodType}
+                        </span>
+                        <span class="mt-2 text-xs text-gray-500">
+                            ${formatTimestamp(data.timestamp)}
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            // Start countdown
+            startCountdown(data.requestId);
+
+            return card;
+        }
+
+        // Function to mask phone number
+        function maskPhoneNumber(phone) {
+            return phone.slice(0, 4) + "XXXX" + phone.slice(-2);
+        }
+
+        // Function to format timestamp
+        function formatTimestamp(date) {
+            return new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
+                .format(Math.round((date - new Date()) / 60000), 'minute');
+        }
+
+        // Function to delete request
+        function deleteRequest(requestId, hospital) {
+            const requestElement = document.getElementById(requestId);
+            if (requestElement) {
+                requestElement.classList.add('fade-out');
+                setTimeout(() => {
+                    requestElement.remove();
+                }, 300);
+            }
+
+            // Remove from hospital's requests
+            if (hospitals[hospital]) {
+                hospitals[hospital].requests = hospitals[hospital].requests.filter(
+                    req => req.requestId !== requestId
+                );
+            }
+        }
+
+        // Function to start countdown
+        function startCountdown(requestId) {
+            let timeLeft = 15 * 60; // 15 minutes in seconds
+            const countdownElement = document.querySelector(`.countdown-${requestId}`);
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    return;
+                }
+
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                countdownElement.textContent = 
+                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Function to show subscription prompt
+        function showSubscriptionPrompt(requestId) {
+            const subscriptionModal = document.createElement('div');
+            subscriptionModal.className = 
+                'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            subscriptionModal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <h3 class="text-xl font-bold mb-4">Premium Feature</h3>
+                    <p class="text-gray-600 mb-4">
+                        Subscribe to our premium service to view full contact details of blood donors and requesters.
+                    </p>
+                    <div class="space-y-4">
+                        <button onclick="handleSubscription('monthly')" 
+                            class="w-full bg-primary text-white py-2 rounded-lg hover:bg-secondary transition">
+                            Monthly Subscription - ₹99/month
+                        </button>
+                        <button onclick="handleSubscription('yearly')" 
+                            class="w-full bg-primary text-white py-2 rounded-lg hover:bg-secondary transition">
+                            Yearly Subscription - ₹999/year
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                            class="w-full bg-gray-100 text-gray-600 py-2 rounded-lg hover:bg-gray-200 transition">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(subscriptionModal);
+        }
+
+        // Function to handle subscription
+        function handleSubscription(plan) {
+            // Here you would implement your payment gateway integration
+            alert(`Thank you for choosing the ${plan} plan. Payment gateway integration would go here.`);
+        }
+
+        // Add this CSS to your styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .fade-out {
+                opacity: 0;
+                transition: opacity 0.3s ease-out;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    <!-- Add this right before the closing body tag, after the existing scripts -->
+    <script>
+        // Get the donor registration form
+        document.getElementById('donorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                fullName: this.querySelector('[name="fullName"]').value,
+                email: this.querySelector('[name="email"]').value,
+                phoneNumber: this.querySelector('[name="phoneNumber"]').value,
+                bloodType: this.querySelector('[name="bloodType"]').value
+            };
+
+            // Validate form data
+            if (!formData.fullName || !formData.email || !formData.phoneNumber || !formData.bloodType) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Create donor card
+            const donorCard = document.createElement('div');
+            donorCard.className = 'bg-white rounded-lg shadow p-4 mb-4';
+            donorCard.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-semibold">${formData.fullName}</h4>
+                        <p class="text-sm text-gray-600">
+                            Blood Type: ${formData.bloodType}
+                        </p>
+                        <p class="text-sm text-gray-500">Contact: ${formData.phoneNumber}</p>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                            Active Donor
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            // Add the donor card to the donors list
+            const donorsList = document.getElementById('donorsList');
+            if (donorsList) {
+                donorsList.insertBefore(donorCard, donorsList.firstChild);
+            }
+
+            // Show success notification
+            showNotification('Registration Successful', `Thank you ${formData.fullName} for registering as a blood donor!`);
+
+            // Clear the form
+            this.reset();
+        });
+
+        // Notification function
+        function showNotification(title, message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-md transform transition-all duration-300 translate-x-full z-50';
+            notification.innerHTML = `
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-gray-900">${title}</h3>
+                        <p class="text-gray-600 mt-1">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 text-gray-400 hover:text-gray-500">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+
+            // Add to document
+            document.body.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
+        }
     </script>
 </body>
 </html>
