@@ -124,7 +124,7 @@
                 <div class="mt-8">
                     <button id="payButton" 
                             class="w-full bg-primary text-white py-4 rounded-lg hover:bg-secondary transition-colors flex items-center justify-center space-x-2">
-                        <span>Pay Securely</span>
+                        <span>Complete Payment Details</span>
                         <i class="fas fa-lock"></i>
                     </button>
                 </div>
@@ -173,6 +173,14 @@
         // Mount the card element
         cardElement.mount('#card-element');
 
+        // Initialize form validation state
+        let isUpiValid = false;
+        let isCardValid = false;
+        let isCardNumberValid = false;
+        const payButton = document.getElementById('payButton');
+        payButton.disabled = true;
+        payButton.classList.add('opacity-50', 'cursor-not-allowed');
+
         // Handle payment method selection
         document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
             radio.addEventListener('change', function() {
@@ -186,51 +194,214 @@
                 if (selectedOption) {
                     selectedOption.classList.remove('hidden');
                 }
+
+                // Reset validation state
+                isUpiValid = false;
+                isCardValid = false;
+                isCardNumberValid = false;
+                updatePayButton();
             });
         });
 
-        // Handle payment submission
+        // UPI ID validation with improved regex
+        const upiInput = document.querySelector('input[placeholder="Enter UPI ID"]');
+        upiInput.addEventListener('input', function() {
+            const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z]{3,}$/;
+            isUpiValid = upiRegex.test(this.value);
+            updatePayButton();
+            
+            // Show real-time validation feedback
+            if (this.value) {
+                if (isUpiValid) {
+                    this.classList.remove('border-red-500');
+                    this.classList.add('border-green-500');
+                    showValidationMessage('Valid UPI ID', 'success');
+                } else {
+                    this.classList.remove('border-green-500');
+                    this.classList.add('border-red-500');
+                    showValidationMessage('Please enter a valid UPI ID (e.g., name@upi)', 'error');
+                }
+            }
+        });
+
+        // Card number validation
+        const cardNumberInput = document.querySelector('#card-number');
+        if (cardNumberInput) {
+            cardNumberInput.addEventListener('input', function(e) {
+                // Remove any non-digit characters
+                let value = this.value.replace(/\D/g, '');
+                
+                // Format the number with spaces
+                if (value.length > 0) {
+                    value = value.match(new RegExp('.{1,4}', 'g')).join(' ');
+                }
+                
+                this.value = value;
+                
+                // Validate card number length (16 digits)
+                isCardNumberValid = value.replace(/\s/g, '').length === 16;
+                updatePayButton();
+
+                // Show validation feedback
+                if (value.length > 0) {
+                    if (isCardNumberValid) {
+                        this.classList.remove('border-red-500');
+                        this.classList.add('border-green-500');
+                        showValidationMessage('Valid card number', 'success');
+                    } else {
+                        this.classList.remove('border-green-500');
+                        this.classList.add('border-red-500');
+                        showValidationMessage('Please enter a valid 16-digit card number', 'error');
+                    }
+                }
+            });
+        }
+
+        // Card validation
+        cardElement.on('change', function(event) {
+            isCardValid = event.complete;
+            updatePayButton();
+            
+            if (event.error) {
+                showError(event.error.message);
+            } else {
+                hideError();
+            }
+        });
+
+        // Show validation messages
+        function showValidationMessage(message, type) {
+            const messageDiv = document.getElementById('validation-message') || document.createElement('div');
+            messageDiv.id = 'validation-message';
+            messageDiv.className = `mt-2 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+            messageDiv.textContent = message;
+
+            const activePaymentSection = document.querySelector('input[name="paymentMethod"]:checked')
+                ?.closest('.border.rounded-lg');
+            if (activePaymentSection && !document.getElementById('validation-message')) {
+                activePaymentSection.appendChild(messageDiv);
+            }
+        }
+
+        // Update pay button state with enhanced validation
+        function updatePayButton() {
+            const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+            let isValid = false;
+
+            switch (selectedMethod) {
+                case 'upi':
+                    isValid = isUpiValid;
+                    break;
+                case 'card':
+                    isValid = isCardNumberValid && isCardValid;
+                    break;
+                case 'netbanking':
+                    isValid = document.querySelector('.netbanking-options select').value !== '';
+                    break;
+            }
+
+            if (isValid) {
+                payButton.disabled = false;
+                payButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                payButton.classList.add('hover:bg-secondary');
+                payButton.innerHTML = `
+                    <span>Proceed to Payment</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                `;
+            } else {
+                payButton.disabled = true;
+                payButton.classList.add('opacity-50', 'cursor-not-allowed');
+                payButton.classList.remove('hover:bg-secondary');
+                payButton.innerHTML = `
+                    <span>Complete Payment Details</span>
+                    <i class="fas fa-lock ml-2"></i>
+                `;
+            }
+        }
+
+        // Handle successful payment and show contact details
+        function handleSuccessfulPayment() {
+            const processingModal = document.getElementById('processingModal');
+            processingModal.classList.add('hidden');
+
+            const successModal = document.createElement('div');
+            successModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            successModal.innerHTML = `
+                <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-5xl text-green-500"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-2">Payment Successful!</h3>
+                    <p class="text-gray-600 mb-6">Your payment has been processed successfully.</p>
+                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                        <p class="text-sm text-gray-600 mb-2">Contact Details</p>
+                        <p class="text-xl font-semibold text-primary">${getStoredContactNumber()}</p>
+                    </div>
+                    <button onclick="redirectToMain()" 
+                        class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-secondary transition-colors">
+                        Continue
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(successModal);
+        }
+
+        // Get stored contact number
+        function getStoredContactNumber() {
+            const pendingRequestId = localStorage.getItem('pendingRequestId');
+            // This would typically come from your backend
+            // For demo, we'll show a dummy number
+            return '+91 98765 43210';
+        }
+
+        // Redirect to main page
+        function redirectToMain() {
+            const pendingRequestId = localStorage.getItem('pendingRequestId');
+            window.location.href = `website.html?payment=success&request=${pendingRequestId}`;
+        }
+
+        // Handle payment submission with loading state
         document.getElementById('payButton').addEventListener('click', async function() {
+            if (this.disabled) return;
+
             const processingModal = document.getElementById('processingModal');
             processingModal.classList.remove('hidden');
 
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-            
             try {
-                if (paymentMethod === 'card') {
-                    const {paymentMethod, error} = await stripe.createPaymentMethod({
-                        type: 'card',
-                        card: cardElement,
-                    });
-
-                    if (error) {
-                        throw error;
-                    }
-
-                    // Send paymentMethod.id to your server
-                    // await processPayment(paymentMethod.id);
-                } else if (paymentMethod === 'upi') {
-                    // Handle UPI payment
-                    const upiId = document.querySelector('input[placeholder="Enter UPI ID"]').value;
-                    // Process UPI payment
-                } else if (paymentMethod === 'netbanking') {
-                    // Handle net banking payment
-                    const bank = document.querySelector('select').value;
-                    // Process net banking payment
-                }
-
                 // Simulate payment processing
-                setTimeout(() => {
-                    processingModal.classList.add('hidden');
-                    showSuccessNotification();
-                    // Redirect to success page or show success message
-                }, 2000);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Store payment success state
+                localStorage.setItem('showFullNumber', 'true');
+                
+                // Show success modal with contact details
+                handleSuccessfulPayment();
 
             } catch (error) {
                 processingModal.classList.add('hidden');
-                alert(error.message);
+                showError(error.message || 'Payment failed. Please try again.');
             }
         });
+
+        // Error handling
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'text-red-500 text-sm mt-2';
+            errorDiv.textContent = message;
+            
+            // Remove any existing error message
+            hideError();
+            
+            // Add new error message
+            document.querySelector('.payment-error')?.appendChild(errorDiv);
+        }
+
+        function hideError() {
+            const existingError = document.querySelector('.payment-error div');
+            if (existingError) {
+                existingError.remove();
+            }
+        }
 
         // Get subscription details from localStorage
         const selectedPlan = localStorage.getItem('selectedPlan');
@@ -248,45 +419,6 @@
             subscriptionDuration.textContent = 'Yearly Plan';
             subscriptionPrice.textContent = '₹999.00';
         }
-
-        // Update success notification function
-        function showSuccessNotification() {
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-md transform transition-all duration-300';
-            notification.innerHTML = `
-                <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-check-circle text-2xl text-green-500"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-gray-900">Payment Successful</h3>
-                        <p class="text-gray-600 mt-1">Your subscription has been activated!</p>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(notification);
-
-            // Store subscription status
-            localStorage.setItem('subscriptionActive', 'true');
-            localStorage.setItem('subscriptionExpiry', new Date(Date.now() + (selectedPlan === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000).toISOString());
-
-            setTimeout(() => {
-                notification.remove();
-                // Redirect back with success parameter
-                window.location.href = `website.html?payment=success&request=${pendingRequestId}`;
-            }, 3000);
-        }
-
-        // Add this to the payment button click handler
-        document.getElementById('payButton').addEventListener('click', async function() {
-            // ... existing payment processing code ...
-
-            // After successful payment, show the full number
-            if (pendingRequestId) {
-                // The full number will be shown back on the main page
-                localStorage.setItem('showFullNumber', 'true');
-            }
-        });
     </script>
 </body>
 </html> 
