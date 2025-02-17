@@ -468,18 +468,48 @@ let map;
 let donorMarker;
 
 function initMap() {
-    // Initialize the map centered at a default location
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 28.6139, lng: 77.2090 }, // Default to New Delhi
-        zoom: 12
+    window.map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 28.6139, lng: 77.2090 }, // Default center (Delhi)
+        zoom: 12,
+        styles: [
+            {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
+            }
+        ]
     });
 
-    // Check if donor data is available
-    const donorData = JSON.parse(localStorage.getItem('donorData'));
-    if (donorData) {
-        const donorLocation = { lat: parseFloat(donorData.locationLat), lng: parseFloat(donorData.locationLng) };
-        addDonorMarker(donorLocation, donorData.isAvailable);
+    // Initialize markers if blood donation system exists
+    if (window.bloodDonationSystem) {
+        window.bloodDonationSystem.updateMapMarkers();
     }
+
+    // Add location search box
+    const input = document.createElement('input');
+    input.className = 'map-search-box';
+    input.placeholder = 'Search location...';
+    window.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+    const searchBox = new google.maps.places.SearchBox(input);
+
+    // Bias SearchBox results towards current map's viewport
+    window.map.addListener('bounds_changed', () => {
+        searchBox.setBounds(window.map.getBounds());
+    });
+
+    // Listen for location selection
+    searchBox.addListener('places_changed', () => {
+        const places = searchBox.getPlaces();
+        if (places.length === 0) return;
+
+        const bounds = new google.maps.LatLngBounds();
+        places.forEach(place => {
+            if (!place.geometry || !place.geometry.location) return;
+            bounds.extend(place.geometry.location);
+        });
+        window.map.fitBounds(bounds);
+    });
 }
 
 function addDonorMarker(location, isAvailable) {
@@ -634,34 +664,14 @@ class BloodDonationSystem {
     constructor() {
         this.donors = new Map();
         this.requests = new Map();
+        this.markers = [];
         this.initializeStorage();
         this.setupEventListeners();
-        this.initializeRequestsList();
-    }
-
-    initializeRequestsList() {
-        // Create requests container if it doesn't exist
-        if (!document.getElementById('activeRequests')) {
-            const requestsContainer = document.createElement('div');
-            requestsContainer.id = 'activeRequests';
-            requestsContainer.className = 'fixed top-24 right-4 w-80 bg-white rounded-lg shadow-xl p-4 max-h-[80vh] overflow-y-auto';
-            requestsContainer.innerHTML = `
-                <h3 class="text-lg font-bold mb-4 text-primary">Active Blood Requests</h3>
-                <div id="requestsList" class="space-y-4"></div>
-            `;
-            document.body.appendChild(requestsContainer);
-        }
-        
-        // Load and display existing requests
-        const storedRequests = localStorage.getItem('requests');
-        if (storedRequests) {
-            JSON.parse(storedRequests).forEach(request => {
-                this.displayRequest(request);
-            });
-        }
+        this.loadExistingData();
     }
 
     initializeStorage() {
+        // Load existing data from localStorage
         const storedDonors = localStorage.getItem('donors');
         const storedRequests = localStorage.getItem('requests');
         
@@ -676,6 +686,13 @@ class BloodDonationSystem {
                 this.requests.set(request.id, request);
             });
         }
+    }
+
+    loadExistingData() {
+        // Display existing donors and requests
+        this.donors.forEach(donor => this.displayDonor(donor));
+        this.requests.forEach(request => this.displayRequest(request));
+        this.updateMapMarkers();
     }
 
     setupEventListeners() {
@@ -695,86 +712,115 @@ class BloodDonationSystem {
     }
 
     handleDonorSubmission(formData) {
-        const donor = {
-            id: Date.now().toString(),
-            name: formData.get('fullName'),
-            email: formData.get('email'),
-            phone: formData.get('phoneNumber'),
-            bloodType: formData.get('bloodType'),
-            available: true,
-            timestamp: new Date().toISOString()
-        };
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const donor = {
+                        id: Date.now().toString(),
+                        name: formData.get('fullName'),
+                        email: formData.get('email'),
+                        phone: formData.get('phoneNumber'),
+                        bloodType: formData.get('bloodType'),
+                        locationLat: position.coords.latitude,
+                        locationLng: position.coords.longitude,
+                        available: true,
+                        timestamp: new Date().toISOString()
+                    };
 
-        this.donors.set(donor.id, donor);
-        this.saveDonors();
-        this.updateDonorsList();
-        this.showSuccessMessage('Thank you for registering as a donor!');
-    }
-
-    handleRequestSubmission(formData) {
-        const request = {
-            id: Date.now().toString(),
-            bloodType: formData.get('bloodType'),
-            hospital: formData.get('hospital'),
-            contactName: formData.get('contactName'),
-            contactPhone: formData.get('contactPhone'),
-            timestamp: new Date().toISOString(),
-            status: 'active'
-        };
-
-        this.requests.set(request.id, request);
-        this.saveRequests();
-        this.displayRequest(request);
-        this.findMatchingDonors(request);
-        this.showSuccessMessage('Blood request submitted successfully!');
-    }
-
-    findMatchingDonors(request) {
-        const matches = Array.from(this.donors.values()).filter(donor => 
-            donor.bloodType === request.bloodType && donor.available
-        );
-
-        if (matches.length > 0) {
-            this.showMatchNotification(matches, request);
+                    this.donors.set(donor.id, donor);
+                    this.saveDonors();
+                    this.displayDonor(donor);
+                    this.updateMapMarkers();
+                    this.showSuccessMessage('Thank you for registering as a donor!');
+                    
+                    // Check for matching requests
+                    this.findMatchingRequests(donor);
+                },
+                (error) => {
+                    alert('Please enable location access to register as a donor');
+                }
+            );
         } else {
-            this.showNoMatchMessage();
+            alert('Geolocation is not supported by your browser');
         }
     }
 
-    showMatchNotification(donors, request) {
+    displayDonor(donor) {
+        const donorsList = document.getElementById('donorsList');
+        const donorElement = document.createElement('div');
+        donorElement.id = `donor-${donor.id}`;
+        donorElement.className = 'bg-gray-50 p-4 rounded-lg shadow border-l-4 border-primary animate-slideIn';
+        
+        donorElement.innerHTML = `
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="inline-block px-2 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-2">
+                        ${donor.bloodType}
+                    </span>
+                    <h4 class="font-medium">${donor.name}</h4>
+                    <p class="text-sm text-gray-600">Available for donation</p>
+                    <p class="text-sm text-gray-600">Registered: ${this.formatTimeAgo(donor.timestamp)}</p>
+                </div>
+                <button onclick="bloodDonationSystem.contactDonor('${donor.id}')"
+                    class="px-3 py-1 bg-primary text-white rounded-lg text-sm hover:bg-secondary transition">
+                    Contact
+                </button>
+            </div>
+        `;
+        
+        // Add to the beginning of the list
+        if (donorsList.firstChild) {
+            donorsList.insertBefore(donorElement, donorsList.firstChild);
+        } else {
+            donorsList.appendChild(donorElement);
+        }
+    }
+
+    findMatchingRequests(donor) {
+        const matches = Array.from(this.requests.values()).filter(request => 
+            request.status === 'active' && request.bloodType === donor.bloodType
+        );
+
+        if (matches.length > 0) {
+            this.showMatchingRequestsNotification(matches, donor);
+        }
+    }
+
+    showMatchingRequestsNotification(requests, donor) {
         const notificationDiv = document.createElement('div');
         notificationDiv.className = 'fixed bottom-4 right-4 bg-white p-6 rounded-lg shadow-xl border-l-4 border-primary max-w-md animate-slideIn';
         
-        const donorsList = donors.map(donor => `
-            <div class="donor-card mb-4 p-4 bg-gray-50 rounded-lg">
+        const requestsList = requests.map(request => `
+            <div class="request-card mb-4 p-4 bg-gray-50 rounded-lg">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h4 class="font-semibold">${donor.name}</h4>
-                        <p class="text-sm text-gray-600">Blood Type: ${donor.bloodType}</p>
+                        <h4 class="font-semibold">${request.hospital}</h4>
+                        <p class="text-sm text-gray-600">Blood Type: ${request.bloodType}</p>
+                        <p class="text-sm text-gray-600">Posted: ${this.formatTimeAgo(request.timestamp)}</p>
                     </div>
-                    <button onclick="window.bloodDonationSystem.connectWithDonor('${donor.id}')" 
+                    <button onclick="bloodDonationSystem.respondToRequest('${request.id}')" 
                         class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
-                        Contact
+                        Respond
                     </button>
                 </div>
             </div>
         `).join('');
 
         notificationDiv.innerHTML = `
-            <h3 class="text-lg font-bold mb-4">Matching Donors Found</h3>
+            <h3 class="text-lg font-bold mb-4">Matching Requests Found</h3>
             <div class="max-h-60 overflow-y-auto">
-                ${donorsList}
+                ${requestsList}
             </div>
         `;
 
         document.body.appendChild(notificationDiv);
     }
 
-    connectWithDonor(donorId) {
+    contactDonor(donorId) {
         const donor = this.donors.get(donorId);
         if (donor) {
             const contactDiv = document.createElement('div');
-            contactDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
+            contactDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
             contactDiv.innerHTML = `
                 <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
                     <h3 class="text-lg font-bold mb-4">Contact Donor</h3>
@@ -782,7 +828,7 @@ class BloodDonationSystem {
                     <p class="mb-2">Phone: ${donor.phone}</p>
                     <p class="mb-4">Email: ${donor.email}</p>
                     <button onclick="this.parentElement.parentElement.remove()" 
-                        class="bg-primary text-white px-4 py-2 rounded-lg w-full">
+                        class="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
                         Close
                     </button>
                 </div>
@@ -797,14 +843,6 @@ class BloodDonationSystem {
 
     saveRequests() {
         localStorage.setItem('requests', JSON.stringify(Array.from(this.requests.values())));
-    }
-
-    updateDonorsList() {
-        // Implementation of updateDonorsList method
-    }
-
-    updateRequestsList() {
-        // Implementation of updateRequestsList method
     }
 
     showSuccessMessage(message) {
