@@ -1519,13 +1519,12 @@
 
         // Function to handle logout
         function logout() {
+            // Clear authentication state
             isAuthenticated = false;
             currentUserType = null;
             localStorage.removeItem('userType');
             localStorage.removeItem('isAuthenticated');
-            
-            // Reset interface
-            updateInterface(null);
+            localStorage.removeItem('userName');
             
             // Show logout notification
             showNotification(
@@ -1534,8 +1533,11 @@
                 'blue'
             );
 
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Wait for notification to be visible then refresh the page
+            setTimeout(() => {
+                // Refresh the page
+                window.location.reload();
+            }, 1000); // Wait 1 second to show the notification before refresh
         }
 
         // Check for existing login on page load
