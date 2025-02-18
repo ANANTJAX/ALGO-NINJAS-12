@@ -67,18 +67,18 @@
                 <div class="mb-6">
                     <label class="block text-gray-700 font-medium mb-2">I am a:</label>
                     <div class="grid grid-cols-2 gap-4">
-                        <label class="flex items-center justify-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors group">
-                            <input type="radio" name="userType" value="donor" required class="hidden">
+                        <label class="flex items-center justify-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors group has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                            <input type="radio" name="userType" value="donor" required class="hidden peer">
                             <div class="text-center">
-                                <i class="fas fa-hand-holding-heart text-2xl mb-2 text-gray-400 group-hover:text-primary"></i>
-                                <p class="font-medium">Blood Donor</p>
+                                <i class="fas fa-hand-holding-heart text-2xl mb-2 text-gray-400 group-hover:text-primary peer-checked:text-primary"></i>
+                                <p class="font-medium group-hover:text-primary peer-checked:text-primary">Blood Donor</p>
                             </div>
                         </label>
-                        <label class="flex items-center justify-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors group">
-                            <input type="radio" name="userType" value="recipient" required class="hidden">
+                        <label class="flex items-center justify-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors group has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                            <input type="radio" name="userType" value="recipient" required class="hidden peer">
                             <div class="text-center">
-                                <i class="fas fa-user-injured text-2xl mb-2 text-gray-400 group-hover:text-primary"></i>
-                                <p class="font-medium">Blood Recipient</p>
+                                <i class="fas fa-user-injured text-2xl mb-2 text-gray-400 group-hover:text-primary peer-checked:text-primary"></i>
+                                <p class="font-medium group-hover:text-primary peer-checked:text-primary">Blood Recipient</p>
                             </div>
                         </label>
                     </div>
@@ -253,6 +253,15 @@
                             <i class="fas fa-user-circle text-sm group-hover:rotate-12 transition-transform"></i>
                             <span class="login-text">Login</span>
                         </button>
+                    </li>
+                    <li id="userStatusIndicator" class="hidden">
+                        <div class="flex items-center space-x-3 bg-green-100 text-green-800 px-4 py-2 rounded-lg">
+                            <i class="fas fa-circle text-xs animate-pulse"></i>
+                            <span class="user-type-text font-medium"></span>
+                            <button onclick="logout()" class="ml-2 text-gray-500 hover:text-red-500 transition-colors">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
                     </li>
                 </ul>
 
@@ -675,6 +684,185 @@
                     <div class="text-center p-4 bg-white rounded-lg shadow">
                         <div class="text-2xl font-bold text-primary mb-2">O-</div>
                         <div class="text-sm text-gray-600">Universal Donor<br>Can give to all</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add this section after the Blood Type Compatibility Chart section and before the Footer -->
+    <section id="about" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-dark">About LifeLink</h2>
+            
+            <!-- Mission and Vision -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                            <i class="fas fa-heart text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Our Mission</h3>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">
+                        To create a seamless connection between blood donors and recipients, ensuring timely access to safe blood 
+                        donation services. We strive to make blood donation more accessible and efficient through technology.
+                    </p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                            <i class="fas fa-eye text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Our Vision</h3>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">
+                        To build a world where no life is lost due to lack of blood availability. We envision a community where 
+                        blood donation is a regular practice and every hospital has adequate blood supply.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Key Features -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-mobile-alt text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Real-time Updates</h3>
+                    <p class="text-gray-600">
+                        Get instant notifications about blood requirements and donor availability in your area.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-hospital text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Hospital Network</h3>
+                    <p class="text-gray-600">
+                        Connected with major hospitals to ensure quick and efficient blood transfer process.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-shield-alt text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Secure Platform</h3>
+                    <p class="text-gray-600">
+                        Your data is protected with end-to-end encryption and strict privacy policies.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Impact Statistics -->
+            <div class="bg-white rounded-xl shadow-sm p-8 mb-16">
+                <h3 class="text-xl font-semibold text-center mb-8">Our Impact</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-primary mb-2">10,000+</div>
+                        <p class="text-gray-600">Lives Saved</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-primary mb-2">5,000+</div>
+                        <p class="text-gray-600">Active Donors</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-primary mb-2">100+</div>
+                        <p class="text-gray-600">Partner Hospitals</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-primary mb-2">50+</div>
+                        <p class="text-gray-600">Cities Covered</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Section -->
+            <div class="text-center mb-16">
+                <h3 class="text-xl font-semibold mb-8">Our Team</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="w-24 h-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
+                            <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="Team Member" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="font-semibold mb-1">Dr. John Doe</h4>
+                        <p class="text-gray-500 text-sm mb-2">Founder & Medical Director</p>
+                        <div class="flex justify-center space-x-3 text-gray-400">
+                            <a href="#" class="hover:text-primary transition-colors" aria-label="LinkedIn Profile">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="hover:text-primary transition-colors" aria-label="Twitter Profile">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="w-24 h-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
+                            <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="Team Member" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="font-semibold mb-1">Dr. Jane Smith</h4>
+                        <p class="text-gray-500 text-sm mb-2">Chief Technology Officer</p>
+                        <div class="flex justify-center space-x-3 text-gray-400">
+                            <a href="#" class="hover:text-primary transition-colors" aria-label="LinkedIn Profile">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="hover:text-primary transition-colors" aria-label="Twitter Profile">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="w-24 h-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
+                            <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="Team Member" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="font-semibold mb-1">Dr. Mike Johnson</h4>
+                        <p class="text-gray-500 text-sm mb-2">Operations Head</p>
+                        <div class="flex justify-center space-x-3 text-gray-400">
+                            <a href="#" class="hover:text-primary transition-colors" aria-label="LinkedIn Profile">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="hover:text-primary transition-colors" aria-label="Twitter Profile">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="bg-white rounded-xl shadow-sm p-8">
+                <h3 class="text-xl font-semibold text-center mb-8">Contact Us</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-phone text-primary"></i>
+                        </div>
+                        <h4 class="font-semibold mb-2">Emergency Helpline</h4>
+                        <p class="text-gray-600">1800-XXX-XXXX</p>
+                        <p class="text-gray-600">(24/7 Available)</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-envelope text-primary"></i>
+                        </div>
+                        <h4 class="font-semibold mb-2">Email Us</h4>
+                        <p class="text-gray-600">support@lifelink.com</p>
+                        <p class="text-gray-600">info@lifelink.com</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-map-marker-alt text-primary"></i>
+                        </div>
+                        <h4 class="font-semibold mb-2">Head Office</h4>
+                        <p class="text-gray-600">123 Healthcare Avenue</p>
+                        <p class="text-gray-600">New Delhi, India</p>
                     </div>
                 </div>
             </div>
@@ -1304,17 +1492,15 @@
             // Reset interface
             updateInterface(null);
             
-            // Show login button
-            const loginBtn = document.getElementById('loginBtn');
-            if (loginBtn) {
-                loginBtn.innerHTML = `
-                    <i class="fas fa-user-circle text-sm group-hover:rotate-12 transition-transform"></i>
-                    <span class="login-text">Login</span>
-                `;
-            }
+            // Show logout notification
+            showNotification(
+                'Logged Out', 
+                'You have been successfully logged out',
+                'blue'
+            );
 
-            // Show logout message
-            showNotification('Logged Out', 'You have been successfully logged out', 'blue');
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Check for existing login on page load
@@ -1343,6 +1529,39 @@
         document.getElementById('requestBtn').addEventListener('click', function() {
             // Smooth scroll to request form section
             document.getElementById('request').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    </script>
+
+    <!-- Add this script to handle user type selection -->
+    <script>
+        // Add click handlers for user type selection
+        document.querySelectorAll('input[name="userType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Remove highlight from all labels
+                document.querySelectorAll('input[name="userType"]').forEach(input => {
+                    const label = input.closest('label');
+                    if (input.checked) {
+                        label.classList.add('border-primary', 'bg-primary/5');
+                        label.querySelector('i').classList.add('text-primary');
+                        label.querySelector('p').classList.add('text-primary');
+                    } else {
+                        label.classList.remove('border-primary', 'bg-primary/5');
+                        label.querySelector('i').classList.remove('text-primary');
+                        label.querySelector('p').classList.remove('text-primary');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Add smooth scrolling for the About link in the navbar -->
+    <script>
+        document.querySelector('a[href="#about"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('#about').scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
             });
