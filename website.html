@@ -1898,7 +1898,7 @@
             `;
             document.body.appendChild(emergencyModal);
 
-            // Handle emergency form submission
+            // Update the emergency form submission handler
             document.getElementById('emergencyForm').addEventListener('submit', function(e) {
                 e.preventDefault();
 
@@ -1923,7 +1923,7 @@
                 // Add to requests array
                 emergencyRequests.unshift(newRequest);
 
-                // Show processing state and close modal
+                // Show processing state
                 const submitBtn = this.querySelector('button[type="submit"]');
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `
@@ -1933,17 +1933,21 @@
                     </div>
                 `;
 
-                // Close emergency form modal after delay
+                // Close the emergency form modal after a short delay
                 setTimeout(() => {
-                    document.querySelector('.emergency-modal')?.remove();
-                    
+                    // Find and remove the emergency modal
+                    const emergencyModal = this.closest('.fixed');
+                    if (emergencyModal) {
+                        emergencyModal.remove();
+                    }
+
                     // Show success notification
                     showNotification(
                         'Emergency Request Sent!',
                         'Nearby donors have been notified. Help is on the way.',
                         'red'
                     );
-                }, 2000);
+                }, 1500);
             });
         });
     </script>
