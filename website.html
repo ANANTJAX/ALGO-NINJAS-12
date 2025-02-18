@@ -112,13 +112,15 @@
                     <p class="text-gray-600 mb-4">Or continue with</p>
                     <div class="flex justify-center space-x-4">
                         <button class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                            aria-label="Login with Facebook">
+                            aria-label="Login with Facebook" title="Login with Facebook">
                             <i class="fab fa-facebook-f w-5"></i>
                         </button>
-                        <button class="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        <button class="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                            aria-label="Login with Google" title="Login with Google">
                             <i class="fab fa-google w-5"></i>
                         </button>
-                        <button class="p-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors">
+                        <button class="p-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                            aria-label="Login with Apple" title="Login with Apple">
                             <i class="fab fa-apple w-5"></i>
                         </button>
                     </div>
@@ -127,7 +129,7 @@
                 <!-- Sign up link -->
                 <div class="mt-6 text-center text-gray-600">
                     Don't have an account? 
-                    <a href="#" class="text-primary hover:text-secondary font-medium">Sign up</a>
+                    <button onclick="showSignupModal()" class="text-primary hover:text-secondary font-medium">Sign up</button>
                 </div>
             </div>
         </div>
@@ -174,7 +176,8 @@
                 </select>
 
                 <!-- Preferred Hospital -->
-                <select name="preferredHospital" required class="w-full px-4 py-3 rounded-lg border">
+                <select name="preferredHospital" required class="w-full px-4 py-3 rounded-lg border"
+                    aria-label="Select Preferred Hospital">
                     <option value="">Select Preferred Hospital</option>
                     <option value="AIIMS_Delhi">AIIMS Delhi</option>
                     <option value="Fortis_Hospital">Fortis Hospital</option>
@@ -258,7 +261,9 @@
                         <div class="flex items-center space-x-3 bg-green-100 text-green-800 px-4 py-2 rounded-lg">
                             <i class="fas fa-circle text-xs animate-pulse"></i>
                             <span class="user-type-text font-medium"></span>
-                            <button onclick="logout()" class="ml-2 text-gray-500 hover:text-red-500 transition-colors">
+                            <button onclick="logout()" 
+                                class="ml-2 text-gray-500 hover:text-red-500 transition-colors"
+                                aria-label="Logout" title="Logout">
                                 <i class="fas fa-sign-out-alt"></i>
                             </button>
                         </div>
@@ -587,7 +592,8 @@
 
                     <div>
                         <label class="block text-gray-700 font-medium mb-2">Blood Type</label>
-                        <select name="bloodType" required class="w-full px-4 py-3 rounded-lg border">
+                        <select name="bloodType" required class="w-full px-4 py-3 rounded-lg border"
+                            aria-label="Select Blood Type">
                             <option value="">Select Blood Type</option>
                             <option value="A+">A+</option>
                             <option value="A-">A-</option>
@@ -617,7 +623,8 @@
                 <form id="bloodRequestForm" class="space-y-6">
                     <div>
                         <label class="block text-gray-700 font-medium mb-2">Blood Type Needed</label>
-                        <select name="bloodType" required class="w-full px-4 py-3 rounded-lg border">
+                        <select name="bloodType" required class="w-full px-4 py-3 rounded-lg border"
+                            aria-label="Select Blood Type">
                             <option value="">Select Blood Type</option>
                             <option value="A+">A+</option>
                             <option value="A-">A-</option>
@@ -632,7 +639,8 @@
 
                     <div>
                         <label class="block text-gray-700 font-medium mb-2">Hospital</label>
-                        <select name="hospital" required class="w-full px-4 py-3 rounded-lg border">
+                        <select name="hospital" required class="w-full px-4 py-3 rounded-lg border"
+                            aria-label="Select Hospital">
                             <option value="">Select Hospital</option>
                             <option value="AIIMS">AIIMS Hospital</option>
                             <option value="Fortis">Fortis Hospital</option>
@@ -905,21 +913,24 @@
         <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
             <h2 class="text-2xl font-bold text-center mb-6">Request Blood</h2>
             <form id="bloodRequestForm" class="space-y-4">
-                <select name="bloodGroup" required class="w-full px-4 py-3 rounded-lg border">
+                <select name="bloodGroup" required class="w-full px-4 py-3 rounded-lg border"
+                    aria-label="Select Blood Group">
                     <option value="">Blood Group Needed</option>
                     <option value="A+">A+</option>
                     <option value="A-">A-</option>
                     <!-- ... other blood groups ... -->
                 </select>
 
-                <select name="urgencyLevel" required class="w-full px-4 py-3 rounded-lg border">
+                <select name="urgencyLevel" required class="w-full px-4 py-3 rounded-lg border"
+                    aria-label="Select Urgency Level">
                     <option value="">Select Urgency Level</option>
                     <option value="normal">Normal</option>
                     <option value="urgent">Urgent</option>
                     <option value="emergency">Emergency</option>
                 </select>
 
-                <select name="hospital" required class="w-full px-4 py-3 rounded-lg border">
+                <select name="hospital" required class="w-full px-4 py-3 rounded-lg border"
+                    aria-label="Select Hospital">
                     <option value="">Select Hospital</option>
                     <option value="AIIMS_Delhi">AIIMS Delhi</option>
                     <!-- ... other hospitals ... -->
@@ -1390,71 +1401,93 @@
 
             // Simulate authentication (replace with actual authentication)
             if (email && password) {
+                // Set authentication state
                 isAuthenticated = true;
                 currentUserType = userType;
                 localStorage.setItem('userType', userType);
                 localStorage.setItem('isAuthenticated', 'true');
 
-                // Close login modal
-                document.getElementById('loginModal').classList.add('hidden');
-
-                // Update interface based on user type
-                updateInterface(userType);
-
-                // Scroll to appropriate form based on user type
-                if (userType === 'donor') {
-                    document.getElementById('donate').scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                } else {
-                    document.getElementById('request').scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                // Force hide all modals immediately
+                const loginModal = document.getElementById('loginModal');
+                const signupModal = document.getElementById('signupModal');
+                loginModal.style.display = 'none';
+                loginModal.classList.add('hidden');
+                if (signupModal) {
+                    signupModal.style.display = 'none';
+                    signupModal.classList.add('hidden');
                 }
 
-                // Show welcome message
+                // Force clear backdrop
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+
+                // Immediately update interface
+                updateInterface(userType);
+
+                // Show welcome notification
                 showNotification(
                     'Welcome Back!', 
                     `You are logged in as a blood ${userType}`,
                     'green'
                 );
+
+                // Reset form and clear inputs
+                this.reset();
+                this.querySelectorAll('input').forEach(input => {
+                    input.value = '';
+                });
+
+                // Clear any error messages
+                const errorMessages = document.querySelectorAll('.error-message');
+                errorMessages.forEach(msg => msg.remove());
+
+                // Force remove any remaining modal classes from body
+                document.body.className = document.body.className
+                    .replace(/modal-open|overflow-hidden|fixed/g, '')
+                    .trim();
             }
         });
 
         // Function to update interface based on user type
         function updateInterface(userType) {
+            if (!userType) return;
+
+            // Force update user status indicator
+            const loginBtn = document.getElementById('loginBtn');
+            const userStatusIndicator = document.getElementById('userStatusIndicator');
+            
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (userStatusIndicator) {
+                userStatusIndicator.style.display = 'block';
+                userStatusIndicator.classList.remove('hidden');
+                const userTypeText = userStatusIndicator.querySelector('.user-type-text');
+                if (userTypeText) {
+                    userTypeText.textContent = `Logged in as ${userType.charAt(0).toUpperCase() + userType.slice(1)}`;
+                }
+            }
+
+            // Force update visibility of appropriate sections
             const donorSection = document.getElementById('donorsList');
             const requestSection = document.getElementById('requestsList');
             const donateButton = document.getElementById('donateBtn');
             const requestButton = document.getElementById('requestBtn');
-            const donateFormSection = document.getElementById('donate');
-            const requestFormSection = document.getElementById('request');
 
             if (userType === 'donor') {
-                // Show only blood requests to donors
-                if (donorSection) donorSection.closest('.bg-white').classList.add('hidden');
-                if (requestSection) requestSection.closest('.bg-white').classList.remove('hidden');
-                
-                // Update buttons and forms visibility
-                if (donateButton) donateButton.classList.remove('hidden');
-                if (requestButton) requestButton.classList.add('hidden');
-                if (donateFormSection) donateFormSection.classList.remove('hidden');
-                if (requestFormSection) requestFormSection.classList.add('hidden');
+                if (donorSection) donorSection.style.display = 'none';
+                if (requestSection) requestSection.style.display = 'block';
+                if (donateButton) donateButton.style.display = 'block';
+                if (requestButton) requestButton.style.display = 'none';
             } else if (userType === 'recipient') {
-                // Show only donor list to recipients
-                if (donorSection) donorSection.closest('.bg-white').classList.remove('hidden');
-                if (requestSection) requestSection.closest('.bg-white').classList.add('hidden');
-                
-                // Update buttons and forms visibility
-                if (donateButton) donateButton.classList.add('hidden');
-                if (requestButton) requestButton.classList.remove('hidden');
-                if (donateFormSection) donateFormSection.classList.add('hidden');
-                if (requestFormSection) requestFormSection.classList.remove('hidden');
+                if (donorSection) donorSection.style.display = 'block';
+                if (requestSection) requestSection.style.display = 'none';
+                if (donateButton) donateButton.style.display = 'none';
+                if (requestButton) requestButton.style.display = 'block';
             }
 
-            // Update navbar
+            // Force update navbar immediately
             updateNavbar(userType);
         }
 
@@ -1474,7 +1507,9 @@
                 loginBtn.innerHTML = `
                     <div class="flex items-center space-x-2">
                         ${userTypeIndicator.outerHTML}
-                        <button onclick="logout()" class="text-sm text-gray-500 hover:text-primary">
+                        <button onclick="logout()" 
+                            class="ml-2 text-gray-500 hover:text-red-500 transition-colors"
+                            aria-label="Logout" title="Logout">
                             <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </div>
@@ -1564,6 +1599,223 @@
             document.querySelector('#about').scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
+            });
+        });
+    </script>
+
+    <!-- Add a sign-up link in the login modal -->
+    <div class="mt-6 text-center text-gray-600">
+        Don't have an account? 
+        <button onclick="showSignupModal()" class="text-primary hover:text-secondary font-medium">Sign up</button>
+    </div>
+
+    <!-- Add event listener to close modals when clicking outside -->
+    <script>
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const loginModal = document.getElementById('loginModal');
+            const signupModal = document.getElementById('signupModal');
+            const loginContent = document.getElementById('modalContent');
+            const signupContent = document.getElementById('signupModalContent');
+
+            // Close login modal if clicking outside
+            if (loginModal && !loginContent.contains(e.target) && !e.target.closest('.close')) {
+                loginModal.classList.add('hidden');
+            }
+
+            // Close signup modal if clicking outside
+            if (signupModal && !signupContent.contains(e.target) && !e.target.closest('.close')) {
+                signupModal.classList.add('hidden');
+            }
+        });
+
+        // Function to show signup modal
+        function showSignupModal() {
+            // Hide login modal
+            document.getElementById('loginModal').classList.add('hidden');
+            // Show signup modal
+            document.getElementById('signupModal').classList.remove('hidden');
+            
+            // Animate modal content
+            setTimeout(() => {
+                document.getElementById('signupModalContent').classList.remove('opacity-0', 'scale-95');
+            }, 10);
+        }
+
+        // Function to show login modal
+        function showLoginModal() {
+            // Hide signup modal
+            document.getElementById('signupModal').classList.add('hidden');
+            // Show login modal
+            document.getElementById('loginModal').classList.remove('hidden');
+            
+            // Animate modal content
+            setTimeout(() => {
+                document.getElementById('modalContent').classList.remove('opacity-0', 'scale-95');
+            }, 10);
+        }
+    </script>
+
+    <!-- Add the signup modal HTML -->
+    <div id="signupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 transform transition-all scale-95 opacity-0" id="signupModalContent">
+            <div class="relative">
+                <!-- Close button -->
+                <button class="close absolute -right-2 -top-2 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
+                    aria-label="Close modal">
+                    <i class="fas fa-times text-gray-500 hover:text-primary"></i>
+                </button>
+
+                <!-- Signup header -->
+                <div class="text-center mb-8">
+                    <div class="inline-block p-3 bg-primary/10 rounded-full mb-4">
+                        <i class="fas fa-user-plus text-4xl text-primary"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
+                    <p class="text-gray-500 mt-1">Join our blood donation community</p>
+                </div>
+
+                <!-- User Type Selection -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-2">I want to register as:</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="flex items-center justify-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors group has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                            <input type="radio" name="signupUserType" value="donor" required class="hidden peer">
+                            <div class="text-center">
+                                <i class="fas fa-hand-holding-heart text-2xl mb-2 text-gray-400 group-hover:text-primary peer-checked:text-primary"></i>
+                                <p class="font-medium group-hover:text-primary peer-checked:text-primary">Blood Donor</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center justify-center p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors group has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                            <input type="radio" name="signupUserType" value="recipient" required class="hidden peer">
+                            <div class="text-center">
+                                <i class="fas fa-user-injured text-2xl mb-2 text-gray-400 group-hover:text-primary peer-checked:text-primary"></i>
+                                <p class="font-medium group-hover:text-primary peer-checked:text-primary">Blood Recipient</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Signup form -->
+                <form id="signupForm" class="space-y-4">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        <input type="text" placeholder="Full Name" required
+                            class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input type="email" placeholder="Email" required
+                            class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" placeholder="Password" required
+                            class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-phone text-gray-400"></i>
+                        </div>
+                        <input type="tel" placeholder="Phone Number" required
+                            class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-primary text-white py-3 rounded-lg hover:bg-secondary transition duration-300 font-medium flex items-center justify-center space-x-2 group">
+                        <span>Create Account</span>
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </form>
+
+                <!-- Login link -->
+                <div class="mt-6 text-center text-gray-600">
+                    Already have an account? 
+                    <button onclick="showLoginModal()" class="text-primary hover:text-secondary font-medium">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this script to handle the signup form submission -->
+    <script>
+        // Handle signup form submission
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fullName = this.querySelector('input[type="text"]').value;
+            const email = this.querySelector('input[type="email"]').value;
+            const password = this.querySelector('input[type="password"]').value;
+            const phone = this.querySelector('input[type="tel"]').value;
+            const userType = document.querySelector('input[name="signupUserType"]:checked')?.value;
+
+            if (!userType) {
+                alert('Please select whether you want to register as a donor or recipient');
+                return;
+            }
+
+            // Validate form data
+            if (!fullName || !email || !password || !phone) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Simulate user registration (replace with actual registration logic)
+            isAuthenticated = true;
+            currentUserType = userType;
+            localStorage.setItem('userType', userType);
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('userName', fullName);
+
+            // Close signup modal with animation
+            const signupModal = document.getElementById('signupModal');
+            const modalContent = document.getElementById('signupModalContent');
+            
+            // First fade out the modal content
+            modalContent.classList.add('opacity-0', 'scale-95');
+            
+            // After content fades out, hide the entire modal
+            setTimeout(() => {
+                signupModal.classList.add('hidden');
+                // Reset the modal content state for next time
+                modalContent.classList.remove('opacity-0', 'scale-95');
+                // Reset form
+                this.reset();
+            }, 200);
+
+            // Update interface based on user type
+            updateInterface(userType);
+
+            // Show success notification
+            showNotification(
+                'Welcome to LifeLink!',
+                `Account created successfully as a blood ${userType}`,
+                'green'
+            );
+        });
+
+        // Add click handlers for user type selection in signup form
+        document.querySelectorAll('input[name="signupUserType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Remove highlight from all labels
+                document.querySelectorAll('input[name="signupUserType"]').forEach(input => {
+                    const label = input.closest('label');
+                    if (input.checked) {
+                        label.classList.add('border-primary', 'bg-primary/5');
+                        label.querySelector('i').classList.add('text-primary');
+                        label.querySelector('p').classList.add('text-primary');
+                    } else {
+                        label.classList.remove('border-primary', 'bg-primary/5');
+                        label.querySelector('i').classList.remove('text-primary');
+                        label.querySelector('p').classList.remove('text-primary');
+                    }
+                });
             });
         });
     </script>
