@@ -1841,59 +1841,59 @@
                         <i class="fas fa-times text-gray-600 text-sm"></i>
                     </button>
 
-                    <div class="text-center mb-6">
+                        <div class="text-center mb-6">
                         <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-ambulance text-3xl text-red-600 animate-pulse"></i>
-                        </div>
+                                <i class="fas fa-ambulance text-3xl text-red-600 animate-pulse"></i>
+                            </div>
                         <h2 class="text-2xl font-bold text-gray-800 mb-2">Emergency Blood Request</h2>
                         <p class="text-gray-600">Please fill in the details for immediate assistance</p>
-                    </div>
+                        </div>
 
                     <form id="emergencyForm" class="space-y-4">
-                        <div>
+                                <div>
                             <label class="block text-gray-700 font-medium mb-2">Blood Group Needed</label>
                             <select name="bloodGroup" required class="w-full px-4 py-3 rounded-lg border focus:border-red-500 focus:ring-2 focus:ring-red-200">
                                 <option value="">Select Blood Group</option>
-                                <option value="A+">A+</option>
-                                <option value="A-">A-</option>
-                                <option value="B+">B+</option>
-                                <option value="B-">B-</option>
-                                <option value="AB+">AB+</option>
-                                <option value="AB-">AB-</option>
-                                <option value="O+">O+</option>
-                                <option value="O-">O-</option>
-                            </select>
-                        </div>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                    </select>
+                                </div>
 
-                        <div>
+                                <div>
                             <label class="block text-gray-700 font-medium mb-2">Hospital Name</label>
                             <input type="text" required placeholder="Enter hospital name"
                                 class="w-full px-4 py-3 rounded-lg border focus:border-red-500 focus:ring-2 focus:ring-red-200">
-                        </div>
+                            </div>
 
-                        <div>
+                            <div>
                             <label class="block text-gray-700 font-medium mb-2">Contact Number</label>
                             <input type="tel" required placeholder="Emergency contact number"
                                 class="w-full px-4 py-3 rounded-lg border focus:border-red-500 focus:ring-2 focus:ring-red-200">
-                        </div>
+                            </div>
 
-                        <div>
+                                <div>
                             <label class="block text-gray-700 font-medium mb-2">Units Required</label>
                             <input type="number" required min="1" placeholder="Number of units needed"
                                 class="w-full px-4 py-3 rounded-lg border focus:border-red-500 focus:ring-2 focus:ring-red-200">
-                        </div>
+                            </div>
 
                         <div class="flex items-center space-x-2 text-red-600">
                             <i class="fas fa-exclamation-circle"></i>
                             <span class="text-sm">This will notify all nearby donors immediately</span>
-                        </div>
+                            </div>
 
-                        <button type="submit" 
+                                <button type="submit"
                             class="w-full bg-red-600 text-white py-4 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2">
                             <i class="fas fa-bell"></i>
                             <span>Send Emergency Request</span>
-                        </button>
-                    </form>
+                                </button>
+                        </form>
                 </div>
             `;
             document.body.appendChild(emergencyModal);
@@ -1901,7 +1901,7 @@
             // Update the emergency form submission handler
             document.getElementById('emergencyForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-
+                
                 // Get form data
                 const bloodGroup = this.querySelector('select[name="bloodGroup"]').value;
                 const hospital = this.querySelector('input[type="text"]').value;
@@ -1967,12 +1967,12 @@
                 const timeAgo = getTimeAgo(request.timestamp);
                 return `
                     <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="flex items-center space-x-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center space-x-2">
                                     <span class="animate-pulse text-red-500">●</span>
                                     <p class="font-medium">Blood Type: ${request.bloodType}</p>
-                                </div>
+                            </div>
                                 <p class="text-gray-600">${request.hospital}</p>
                                 <p class="text-sm text-gray-500">Requested: ${timeAgo}</p>
                                 <p class="text-sm text-gray-600 mt-2">Contact: ${request.contact}</p>
@@ -1988,7 +1988,7 @@
                         <div class="mt-4 flex justify-end space-x-2">
                             <button onclick="cancelRequest(${request.id})" class="px-3 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-sm">
                                 Cancel Request
-                            </button>
+                                </button>
                             <button onclick="viewRequestStatus(${request.id})" class="px-3 py-1 bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors text-sm">
                                 View Status
                             </button>
@@ -2055,6 +2055,557 @@
             const days = Math.floor(hours / 24);
             return `${days} day${days > 1 ? 's' : ''} ago`;
         }
+    </script>
+
+    <!-- Add this code to handle subscription payment when clicking on donor contact -->
+    <script>
+        function showSubscriptionPayment(donorId) {
+            const paymentModal = document.createElement('div');
+            paymentModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            paymentModal.innerHTML = `
+                <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 animate-fadeIn relative">
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                        class="absolute -top-0.1 -right-0.1 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-100 transition-colors border border-gray-200">
+                        <i class="fas fa-times text-gray-600 text-sm"></i>
+                    </button>
+
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-crown text-3xl text-primary"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Subscribe to View Contact</h2>
+                        <p class="text-gray-600">Choose a subscription plan to access donor details</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Subscription Plans -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <!-- Monthly Plan -->
+                            <label class="relative cursor-pointer">
+                                <input type="radio" name="plan" value="monthly" class="peer hidden" checked>
+                                <div class="p-4 border rounded-lg peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
+                                    <div class="text-center">
+                                        <span class="text-sm text-gray-500">Monthly</span>
+                                        <div class="text-2xl font-bold text-gray-800 my-1">₹99</div>
+                                        <span class="text-xs text-gray-500">/month</span>
+                                    </div>
+                                </div>
+                                <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-primary">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </label>
+
+                            <!-- Yearly Plan -->
+                            <label class="relative cursor-pointer">
+                                <input type="radio" name="plan" value="yearly" class="peer hidden">
+                                <div class="p-4 border rounded-lg peer-checked:border-primary peer-checked:bg-primary/5 transition-colors">
+                                    <div class="text-center">
+                                        <span class="text-sm text-gray-500">Yearly</span>
+                                        <div class="text-2xl font-bold text-gray-800 my-1">₹999</div>
+                                        <span class="text-xs text-gray-500">/year</span>
+                                    </div>
+                                    <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                                        Save 16%
+                                    </div>
+                                </div>
+                                <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-primary">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Plan Features -->
+                        <div class="bg-gray-50 p-4 rounded-lg space-y-3 mb-6">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check text-green-500"></i>
+                                <span class="text-gray-600">View donor contact details</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check text-green-500"></i>
+                                <span class="text-gray-600">Direct communication with donors</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check text-green-500"></i>
+                                <span class="text-gray-600">Priority support</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Button -->
+                        <button onclick="proceedToPayment()" class="w-full bg-primary text-white py-4 rounded-lg hover:bg-secondary transition-colors flex items-center justify-center space-x-2">
+                            <i class="fas fa-lock"></i>
+                            <span>Proceed to Secure Payment</span>
+                        </button>
+
+                        <!-- Security Badge -->
+                        <div class="flex items-center justify-center space-x-2 text-gray-500 text-sm mt-4">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure payment powered by Razorpay</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(paymentModal);
+
+            // Handle plan selection
+            const planInputs = paymentModal.querySelectorAll('input[name="plan"]');
+            planInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    localStorage.setItem('selectedPlan', this.value);
+            });
+        });
+        }
+
+        // Function to handle payment
+        function proceedToPayment() {
+            const selectedPlan = localStorage.getItem('selectedPlan') || 'monthly';
+            window.location.href = `payment.html?plan=${selectedPlan}`;
+        }
+
+        // Update the donor click handler
+        document.querySelectorAll('.donor-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (!isAuthenticated) {
+                    showLoginModal();
+                    return;
+                }
+
+                const donorId = this.dataset.donorId;
+                const hasSubscription = localStorage.getItem('subscriptionActive') === 'true';
+                
+                if (!hasSubscription) {
+                    showSubscriptionPayment(donorId);
+                } else {
+                    // Show donor contact details
+                    showDonorDetails(donorId);
+                }
+            });
+        });
+    </script>
+
+    <!-- Add this function to handle donor contact button clicks -->
+    <script>
+        // Add this function to handle donor contact button clicks
+        function handleDonorContact(donorId) {
+            // Check if user is logged in
+            if (!isAuthenticated) {
+                showLoginModal();
+                return;
+            }
+
+            // Check if user is a recipient
+            const userType = localStorage.getItem('userType');
+            if (userType !== 'recipient') {
+                showNotification(
+                    'Access Denied',
+                    'Only recipients can view donor contact details',
+                    'red'
+                );
+                return;
+            }
+
+            // Check subscription status
+            const hasSubscription = localStorage.getItem('subscriptionActive') === 'true';
+            if (!hasSubscription) {
+                showSubscriptionPayment(donorId);
+            } else {
+                // Show donor contact details if subscription is active
+                showDonorDetails(donorId);
+            }
+        }
+
+        // Add this to show donor details
+        function showDonorDetails(donorId) {
+            const detailsModal = document.createElement('div');
+            detailsModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            detailsModal.innerHTML = `
+                <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 animate-fadeIn relative">
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                        class="absolute -top-0.1 -right-0.1 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-100 transition-colors border border-gray-200">
+                        <i class="fas fa-times text-gray-600 text-sm"></i>
+                    </button>
+
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user text-3xl text-primary"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Donor Details</h2>
+                        <p class="text-gray-600">Contact information for the donor</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Name</p>
+                                    <p class="font-medium">John Doe</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Blood Group</p>
+                                    <p class="font-medium">A+</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Contact</p>
+                                    <p class="font-medium">+91 98765-43210</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Location</p>
+                                    <p class="font-medium">Delhi, India</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                                <div>
+                                    <p class="text-sm text-blue-800 font-medium">Important Note</p>
+                                    <p class="text-sm text-blue-600">Please contact the donor during reasonable hours and be respectful of their time.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3">
+                            <button onclick="window.location.href='tel:+919876543210'" 
+                                class="flex-1 bg-primary text-white py-3 rounded-lg hover:bg-secondary transition-colors flex items-center justify-center space-x-2">
+                                <i class="fas fa-phone"></i>
+                                <span>Call Donor</span>
+                            </button>
+                            <button onclick="window.location.href='sms:+919876543210'" 
+                                class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2">
+                                <i class="fas fa-sms"></i>
+                                <span>Send SMS</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(detailsModal);
+        }
+
+        // Update the donor cards to use the new handler
+        document.querySelectorAll('.donor-card').forEach(card => {
+            const contactBtn = card.querySelector('.contact-btn');
+            if (contactBtn) {
+                contactBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const donorId = card.dataset.donorId;
+                    handleDonorContact(donorId);
+                });
+            }
+        });
+    </script>
+
+    <!-- Add a variable to store blood requests -->
+    <script>
+        // Add a variable to store blood requests
+        let bloodRequests = [];
+
+        // Update the blood request form submission handler
+        document.getElementById('bloodRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get form data
+            const bloodType = this.querySelector('select[name="bloodType"]').value;
+            const hospital = this.querySelector('select[name="hospital"]').value;
+            const units = this.querySelector('input[name="units"]').value;
+            const urgency = this.querySelector('select[name="urgencyLevel"]').value;
+            const contact = this.querySelector('input[name="contact"]').value;
+
+            // Create new request object
+            const newRequest = {
+                id: Date.now(),
+                bloodType,
+                hospital,
+                units,
+                urgency,
+                contact,
+                timestamp: new Date(),
+                status: 'Active',
+                requestedBy: localStorage.getItem('userName') || 'Anonymous'
+            };
+
+            // Add to requests array
+            bloodRequests.unshift(newRequest);
+
+            // Update the blood requests section
+            updateBloodRequestsList();
+
+            // Show success notification
+            showNotification(
+                'Request Submitted',
+                'Your blood request has been posted successfully',
+                'green'
+            );
+
+            // Reset form
+            this.reset();
+        });
+
+        // Function to update blood requests list
+        function updateBloodRequestsList() {
+            const requestsList = document.getElementById('requestsList');
+            if (!requestsList) return;
+
+            requestsList.innerHTML = bloodRequests.map(request => `
+                <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                    <div class="flex items-center space-x-2">
+                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                                    ${request.bloodType}
+                                </span>
+                                <span class="px-3 py-1 bg-${getUrgencyColor(request.urgency)}-100 
+                                    text-${getUrgencyColor(request.urgency)}-800 rounded-full text-sm">
+                                    ${request.urgency}
+                                </span>
+                            </div>
+                            <h3 class="font-medium mt-2">${request.hospital}</h3>
+                            <p class="text-gray-600 text-sm mt-1">
+                                Requested by: ${request.requestedBy}
+                            </p>
+                            <p class="text-gray-500 text-sm mt-1">
+                                ${getTimeAgo(request.timestamp)}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium">${request.units} units needed</p>
+                            <button onclick="contactRequester('${request.id}')" 
+                                class="mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors text-sm">
+                                Respond to Request
+                        </button>
+                    </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t">
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-2 text-gray-600">
+                                <i class="fas fa-phone"></i>
+                                <span>Contact: ${maskContact(request.contact)}</span>
+                            </div>
+                            <span class="text-${request.status === 'Active' ? 'green' : 'gray'}-600">
+                                ${request.status}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Helper function to get urgency color
+        function getUrgencyColor(urgency) {
+            switch(urgency.toLowerCase()) {
+                case 'critical':
+                    return 'red';
+                case 'urgent':
+                    return 'orange';
+                case 'moderate':
+                    return 'yellow';
+                default:
+                    return 'gray';
+            }
+        }
+
+        // Helper function to mask contact number
+        function maskContact(contact) {
+            return `${contact.slice(0, 2)}XXXXXX${contact.slice(-2)}`;
+        }
+
+        // Helper function to format time ago
+        function getTimeAgo(timestamp) {
+            const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            const days = Math.floor(hours / 24);
+            return `${days} day${days > 1 ? 's' : ''} ago`;
+        }
+
+        // Function to handle contacting requester
+        function contactRequester(requestId) {
+            const request = bloodRequests.find(r => r.id.toString() === requestId);
+            if (!request) return;
+
+            const contactModal = document.createElement('div');
+            contactModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            contactModal.innerHTML = `
+                <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 animate-fadeIn relative">
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                        class="absolute -top-0.1 -right-0.1 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-100 transition-colors border border-gray-200">
+                        <i class="fas fa-times text-gray-600 text-sm"></i>
+                    </button>
+
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-hand-holding-heart text-3xl text-primary"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Contact Requester</h2>
+                        <p class="text-gray-600">Respond to blood request</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="font-medium">Request Details</p>
+                            <p class="text-gray-600 mt-1">Blood Type: ${request.bloodType}</p>
+                            <p class="text-gray-600">Units Needed: ${request.units}</p>
+                            <p class="text-gray-600">Hospital: ${request.hospital}</p>
+                        </div>
+
+                        <div class="flex space-x-3">
+                            <button onclick="window.location.href='tel:${request.contact}'" 
+                                class="flex-1 bg-primary text-white py-3 rounded-lg hover:bg-secondary transition-colors flex items-center justify-center space-x-2">
+                                <i class="fas fa-phone"></i>
+                                <span>Call Now</span>
+                            </button>
+                            <button onclick="window.location.href='sms:${request.contact}'" 
+                                class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2">
+                                <i class="fas fa-sms"></i>
+                                <span>Send SMS</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(contactModal);
+        }
+    </script>
+
+    <!-- Add this HTML section for displaying blood requests -->
+    <div id="bloodRequestsSection" class="container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">Blood Requests</h2>
+            <p class="text-gray-600">Recent blood requests from recipients</p>
+        </div>
+
+        <!-- Blood Requests List -->
+        <div id="requestsList" class="grid gap-6">
+            <!-- Requests will be dynamically inserted here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-clipboard-list text-2xl text-gray-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-800">No Blood Requests</h3>
+            <p class="text-gray-600">There are no active blood requests at the moment</p>
+        </div>
+    </div>
+
+    <!-- Add this script to handle blood requests -->
+    <script>
+        // Initialize blood requests array in localStorage if it doesn't exist
+        if (!localStorage.getItem('bloodRequests')) {
+            localStorage.setItem('bloodRequests', JSON.stringify([]));
+        }
+
+        // Function to load blood requests from localStorage
+        function loadBloodRequests() {
+            return JSON.parse(localStorage.getItem('bloodRequests') || '[]');
+        }
+
+        // Function to save blood requests to localStorage
+        function saveBloodRequests(requests) {
+            localStorage.setItem('bloodRequests', JSON.stringify(requests));
+        }
+
+        // Update the blood request form submission handler
+        document.getElementById('bloodRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get form data
+            const formData = new FormData(this);
+            const newRequest = {
+                id: Date.now(),
+                bloodType: formData.get('bloodType'),
+                hospital: formData.get('hospital'),
+                units: formData.get('units'),
+                urgency: formData.get('urgencyLevel'),
+                contact: formData.get('contact'),
+                timestamp: new Date().toISOString(),
+                status: 'Active',
+                requestedBy: localStorage.getItem('userName') || 'Anonymous'
+            };
+
+            // Add to requests array
+            const requests = loadBloodRequests();
+            requests.unshift(newRequest);
+            saveBloodRequests(requests);
+
+            // Update display
+            updateBloodRequestsList();
+
+            // Show success notification
+            showNotification(
+                'Request Submitted',
+                'Your blood request has been posted successfully',
+                'green'
+            );
+
+            // Reset form
+            this.reset();
+        });
+
+        // Function to update blood requests list
+        function updateBloodRequestsList() {
+            const requestsList = document.getElementById('requestsList');
+            const emptyState = document.getElementById('emptyState');
+            const requests = loadBloodRequests();
+
+            if (requests.length === 0) {
+                requestsList.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            requestsList.innerHTML = requests.map(request => `
+                <div class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                                    ${request.bloodType}
+                                </span>
+                                <span class="px-3 py-1 bg-${getUrgencyColor(request.urgency)}-100 
+                                    text-${getUrgencyColor(request.urgency)}-800 rounded-full text-sm">
+                                    ${request.urgency}
+                                </span>
+                            </div>
+                            <h3 class="font-medium mt-2">${request.hospital}</h3>
+                            <p class="text-gray-600 text-sm mt-1">
+                                Requested by: ${request.requestedBy}
+                            </p>
+                            <p class="text-gray-500 text-sm mt-1">
+                                ${getTimeAgo(request.timestamp)}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium">${request.units} units needed</p>
+                            <button onclick="respondToRequest('${request.id}')" 
+                                class="mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors text-sm">
+                                Respond to Request
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t">
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-2 text-gray-600">
+                                <i class="fas fa-phone"></i>
+                                <span>Contact: ${maskContact(request.contact)}</span>
+                            </div>
+                            <span class="text-${request.status === 'Active' ? 'green' : 'gray'}-600">
+                                ${request.status}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize the blood requests list on page load
+        document.addEventListener('DOMContentLoaded', updateBloodRequestsList);
     </script>
 </body>
 </html>
