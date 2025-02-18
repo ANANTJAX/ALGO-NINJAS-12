@@ -252,6 +252,12 @@
                         </button>
                     </li>
                     <li>
+                        <button onclick="showEmergencyHistory()" class="flex items-center space-x-2 hover:text-primary transition group">
+                            <i class="fas fa-history text-sm group-hover:scale-110 transition-transform"></i>
+                            <span>Emergency History</span>
+                        </button>
+                    </li>
+                    <li>
                         <button id="loginBtn" class="flex items-center space-x-2 bg-primary text-white px-6 py-2 rounded-lg hover:bg-secondary transition duration-300 group">
                             <i class="fas fa-user-circle text-sm group-hover:rotate-12 transition-transform"></i>
                             <span class="login-text">Login</span>
@@ -1954,6 +1960,147 @@
                 }, 2000);
             });
         });
+    </script>
+
+    <!-- Add this script to handle the Emergency History functionality -->
+    <script>
+        function showEmergencyHistory() {
+            const historyModal = document.createElement('div');
+            historyModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            historyModal.innerHTML = `
+                <div class="bg-white rounded-xl p-8 max-w-4xl w-full mx-4 animate-fadeIn relative max-h-[90vh] overflow-y-auto">
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                        class="absolute -top-0.1 -right-0.1 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-100 transition-colors border border-gray-200">
+                        <i class="fas fa-times text-gray-600 text-sm"></i>
+                    </button>
+
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-history text-3xl text-primary"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Emergency Request History</h2>
+                        <p class="text-gray-600">Track all your emergency blood requests</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Active Requests Section -->
+                        <div class="border rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                                <i class="fas fa-clock text-yellow-500 mr-2"></i>
+                                Active Requests
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="bg-yellow-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium">Blood Type: A+</p>
+                                            <p class="text-gray-600">AIIMS Hospital, Delhi</p>
+                                            <p class="text-sm text-gray-500">Requested: 2 hours ago</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+                                                Processing
+                                            </span>
+                                            <p class="text-sm mt-2">3 units needed</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex justify-end space-x-2">
+                                        <button class="px-3 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-sm">
+                                            Cancel Request
+                                        </button>
+                                        <button class="px-3 py-1 bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors text-sm">
+                                            View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Completed Requests Section -->
+                        <div class="border rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                Completed Requests
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium">Blood Type: O+</p>
+                                            <p class="text-gray-600">Max Hospital, Delhi</p>
+                                            <p class="text-sm text-gray-500">Completed: 3 days ago</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                                                Fulfilled
+                                            </span>
+                                            <p class="text-sm mt-2">2 units received</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex justify-end">
+                                        <button class="px-3 py-1 bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors text-sm">
+                                            View Details
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium">Blood Type: B+</p>
+                                            <p class="text-gray-600">Fortis Hospital, Delhi</p>
+                                            <p class="text-sm text-gray-500">Completed: 1 week ago</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                                                Fulfilled
+                                            </span>
+                                            <p class="text-sm mt-2">1 unit received</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex justify-end">
+                                        <button class="px-3 py-1 bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors text-sm">
+                                            View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cancelled Requests Section -->
+                        <div class="border rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                                <i class="fas fa-ban text-red-500 mr-2"></i>
+                                Cancelled Requests
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium">Blood Type: AB+</p>
+                                            <p class="text-gray-600">Apollo Hospital, Delhi</p>
+                                            <p class="text-sm text-gray-500">Cancelled: 2 weeks ago</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
+                                                Cancelled
+                                            </span>
+                                            <p class="text-sm mt-2">Request cancelled by user</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex justify-end">
+                                        <button class="px-3 py-1 bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors text-sm">
+                                            View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(historyModal);
+        }
     </script>
 </body>
 </html>
